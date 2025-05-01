@@ -15,10 +15,6 @@ namespace AIHelicopterGunner.AIStates.WM
         public override float WarmUp => 0.5f;
         public override float CoolDown => 0.5f;
 
-        private const float maxError = 15f;
-        private const float minRange = 500f;
-        private const float maxRange = 4000f;
-
         private HPEquipOpticalML missileLauncher;
         private Missile launchedMissile;
 
@@ -46,9 +42,9 @@ namespace AIHelicopterGunner.AIStates.WM
             float error = Vector3.Angle(wm.transform.forward, tgpMfd.opticalTargeter.cameraTransform.forward);
             float range = (tgpMfd.opticalTargeter.lockedActor.position - wm.transform.position).magnitude;
 
-            return error < maxError
-                && range < maxRange
-                && range > minRange
+            return error < AIGunnerConsts.omImmediateFov
+                && range < AIGunnerConsts.omMaxRange
+                && range > AIGunnerConsts.omMinRange
                 //&& missileLauncher.LaunchAuthorized()
                 && (launchedMissile == null
                 || !launchedMissile.fired)

@@ -13,8 +13,6 @@ namespace AIHelicopterGunner.AIStates.WM
         public override float CoolDown => 3f;
 
         private const float maxError = 2f;
-        private const float minRange = 50f;
-        private const float maxRange = 2000f;
 
         private const float maxBurstLength = 0.3f;
         private const float minBurstLength = 1.5f;
@@ -43,8 +41,8 @@ namespace AIHelicopterGunner.AIStates.WM
             float range = (tgpMfd.opticalTargeter.lockedActor.position - turret.turret.pitchTransform.position).magnitude;
 
             return error < maxError
-                && range < maxRange
-                && range > minRange;
+                && range < AIGunnerConsts.gunMaxRange
+                && range > AIGunnerConsts.gunMinRange;
         }
 
         public override void StartState()

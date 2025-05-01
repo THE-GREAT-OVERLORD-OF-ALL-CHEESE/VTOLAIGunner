@@ -200,7 +200,7 @@ namespace AIHelicopterGunner.Components
 
             AttackBehaviour attackBehaviour = null;
 
-            if (tgpMfd.opticalTargeter.lockedActor != null)
+            if (tgpMfd.opticalTargeter.lockedActor != null && tgpMfd.opticalTargeter.lockedActor.alive)
             {
                 attackBehaviour = attackBehaviourShortlist.FirstOrDefault(a => a.AppropriateTarget(tgpMfd.opticalTargeter.lockedActor)
                     && a.CanAttackTarget(tgpMfd.opticalTargeter.lockedActor)
