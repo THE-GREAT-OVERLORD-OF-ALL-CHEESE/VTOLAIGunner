@@ -4,76 +4,81 @@
     <OutputType>Library</OutputType>
     <LangVersion>default</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <VTOLVRLibs>C:\Program Files (x86)\Steam\steamapps\common\VTOL VR\Unity-Libs</VTOLVRLibs>
+    <ModOutputDir>C:\Program Files (x86)\Steam\steamapps\common\VTOL VR\VTOLVR-Mods\AIHelicopterGunner\</ModOutputDir>
   </PropertyGroup>
+
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/0Harmony.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\0Harmony.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="ModLoader.Framework">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/ModLoader.Framework.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\ModLoader.Framework.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="SteamQueries.Models">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/SteamQueries.Models.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\SteamQueries.Models.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Assembly-CSharp" Publicize="True">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/Assembly-CSharp.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/UnityEngine.AssetBundleModule.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\UnityEngine.AssetBundleModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/UnityEngine.JSONSerializeModule.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\UnityEngine.JSONSerializeModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/UnityEngine.ParticleSystemModule.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\UnityEngine.ParticleSystemModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/UnityEngine.UI.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\UnityEngine.UI.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/UnityEngine.UIModule.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\UnityEngine.UIModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestAssetBundleModule">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
     <Reference Include="Valve.Newtonsoft.Json">
-      <HintPath>/users/wolf.dean/Unity-Libs/VTOLVR/Valve.Newtonsoft.Json.dll</HintPath>
+      <HintPath>$(VTOLVRLibs)\Valve.Newtonsoft.Json.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(ProjectDir)item.json&quot; &quot;/users/wolf.dean/VTOLVR-Mods/AIHelicopterGunner/&quot; /i /y&#xA;xcopy &quot;$(TargetPath)&quot; &quot;/users/wolf.dean/VTOLVR-Mods/AIHelicopterGunner/&quot; /i /y" />
+    <Exec Command="xcopy &quot;$(ProjectDir)item.json&quot; &quot;$(ModOutputDir)&quot; /i /y &amp;&amp; xcopy &quot;$(TargetPath)&quot; &quot;$(ModOutputDir)&quot; /i /y" />
   </Target>
 </Project>
