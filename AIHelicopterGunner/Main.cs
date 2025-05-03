@@ -9,7 +9,7 @@ namespace AIHelicopterGunner
     {
         private void Awake()
         {
-            Debug.Log($"{modName}: Ready!");
+            Debug.Log($"{modName}: Ready to gun!");
             Debug.Log($"{aiGunnerName} here, I am combat ready!");
         }
 
@@ -19,6 +19,6 @@ namespace AIHelicopterGunner
         }
 
         public const string modName = "AIHelicopterGunner";
-        public const string aiGunnerName = "Marisa";
+        public const string aiGunnerName = "Aurora";
     }
 }
