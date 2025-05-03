@@ -1,9 +1,7 @@
 ﻿using AIHelicopterGunner.Components;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 namespace AIHelicopterGunner.AIStates.WM
 {
@@ -19,8 +17,7 @@ namespace AIHelicopterGunner.AIStates.WM
 
         private HPEquipOpticalML missileLauncher;
 
-        private const int tankSalvo = 3;
-        private const int infantrySalvo = 1;
+        private const int maxSalvoSize = 5;
         private int salvoLeft;
         private const float shotCoolDown = 0.3f;
         private float shotCoolDownTimer;
@@ -67,16 +64,7 @@ namespace AIHelicopterGunner.AIStates.WM
                 return;
             }
 
-            switch (tgpMfd.opticalTargeter.lockedActor.role)
-            {
-                case Actor.Roles.Ground:
-                    salvoLeft = infantrySalvo;
-                    break;
-                case Actor.Roles.GroundArmor:
-                default:
-                    salvoLeft = tankSalvo;
-                    break;
-            }
+            salvoLeft = Mathf.Clamp(Mathf.CeilToInt(tgpMfd.opticalTargeter.lockedActor.health.maxHealth / 30), 1, maxSalvoSize);
         }
 
         public override void UpdateState()

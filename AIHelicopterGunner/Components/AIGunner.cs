@@ -1,5 +1,6 @@
 ﻿using AIHelicopterGunner.AIHelpers;
 using AIHelicopterGunner.AIStates;
+using AIHelicopterGunner.AIStates.Equip;
 using AIHelicopterGunner.AIStates.MFDStates;
 using AIHelicopterGunner.AIStates.Power;
 using AIHelicopterGunner.AIStates.TGP;
@@ -8,6 +9,7 @@ using AIHelicopterGunner.AttackBehaviours;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using VTOLVR.DLC.Rotorcraft;
 
 namespace AIHelicopterGunner.Components
 {
@@ -18,6 +20,8 @@ namespace AIHelicopterGunner.Components
         private WeaponManager wm;
         private MFD mfd;
         private TargetingMFDPage tgpMfd;
+
+        private ArticulatingHardpoint autoPylon;
 
         private State_Sequence sequence;
 
@@ -43,6 +47,8 @@ namespace AIHelicopterGunner.Components
             wm = GetComponentInChildren<WeaponManager>(true);
             mfd = GetComponentInChildren<MFD>(true);
             tgpMfd = GetComponentInChildren<TargetingMFDPage>(true);
+
+            autoPylon = GetComponentInChildren<ArticulatingHardpoint>(true);
 
             State_Sequence ensurePower = new State_Sequence(
                 new List<AITryState>
@@ -93,6 +99,7 @@ namespace AIHelicopterGunner.Components
                     tgpSlewToTarget,
                     new State_WMCycleWeaponOpticalMissile(wm),
                     new State_EquipSwitchOpticalMissleAutoUncage(wm, tgpMfd),
+                    new State_PylonAuto(autoPylon),
                     new State_WMFireOpticalMissile(this, wm, tgpMfd),
                 },
                 "Engage with Optical Missile",
@@ -107,6 +114,7 @@ namespace AIHelicopterGunner.Components
                     tgpSlewToTarget,
                     new State_WMCycleWeaponOpticalMissileFaf(wm),
                     new State_EquipSwitchOpticalMissleAutoUncage(wm, tgpMfd),
+                    new State_PylonAuto(autoPylon),
                     new State_WMFireOpticalMissileFaf(this, wm, tgpMfd),
                 },
                 "Engage with Optical Missile FaF",
@@ -121,6 +129,7 @@ namespace AIHelicopterGunner.Components
                     tgpSlewToTarget,
                     new State_WMCycleWeaponGuidedRocket(wm),
                     new State_EquipSwitchOpticalMissleAutoUncage(wm, tgpMfd),
+                    new State_PylonAuto(autoPylon),
                     new State_WMFireGuidedRocketSalvo(this, wm, tgpMfd),
                 },
                 "Engage with Guided Rockets",
@@ -135,6 +144,7 @@ namespace AIHelicopterGunner.Components
                     tgpSlewToTarget,
                     new State_WMCycleWeaponTOW(wm),
                     new State_EquipSwitchOpticalMissleAutoUncage(wm, tgpMfd),
+                    new State_PylonAuto(autoPylon),
                     new State_WMFireOpticalMissile(this, wm, tgpMfd),
                 },
                 "Engage with TOW Missile",
@@ -151,44 +161,50 @@ namespace AIHelicopterGunner.Components
                 new AttackBehaviour_Guns(this, wm, cannonSequence, 10f)
             };
 
-            sequence = guidedRocket;
+            sequence = cannonSequence;
         }
 
         private void Update()
         {
             missileHelper.UpdateMissilePerTarget();
 
-            DetermineTarget(out Actor target, out AttackBehaviour attackBehaviour);
-            this.target = target;
-
-            if (attackBehaviour != null)
+            if (sequence.Idle)
             {
-                sequence = attackBehaviour.Sequence;
-            }
+                DetermineTarget(out Actor target, out AttackBehaviour attackBehaviour);
+                this.target = target;
 
-            if (target != lastTarget || attackBehaviour != lastAttackBehviour)
-            {
-                lastTarget = target;
-                lastAttackBehviour = attackBehaviour;
-
-                TutorialLabel.instance.HideLabel();
-                TutorialLabel.instance.DisplayLabel($"{Main.aiGunnerName}: Targeting: {target.actorName ?? "nothing"} with {attackBehaviour.Name}",
-                    null,
-                    5f);
-
-                Debug.Log($"{Main.aiGunnerName}: New strat is to engage {target.actorName} with {attackBehaviour.Name}({(target.position - transform.position).magnitude}m)");
-                Debug.Log($"{wm.equips.Count(e => e is HPEquipGunTurret turret)} gun turrets were available");
-                Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsNotOpticalFaf(ml))} optical launchers were available");
-                Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsOpticalFaf(ml))} optical faf launchers were available");
-                Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsGuidedRocketLauncher(ml))} guided rocket launchers were available");
-                Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsTow(ml))} tow were available");
-
-                /*
-                foreach (AttackBehaviour attackBehaviour in attackBehaviourShortlist)
+                if (attackBehaviour != null)
                 {
-                    Debug.Log($"Behaviour {attackBehaviour.Name}, HasAmmo: {attackBehaviour.HaveAmmo()}, AppropriateTarget: {attackBehaviour.AppropriateTarget(target)}, CanAttackImmediately: {attackBehaviour.CanAttackImmediately(target)}");
+                    sequence = attackBehaviour.Sequence;
+
+                    if (target != lastTarget || attackBehaviour != lastAttackBehviour)
+                    {
+                        lastTarget = target;
+                        lastAttackBehviour = attackBehaviour;
+
+                        Vector3 offset = target.position - transform.position;
+                        float angularSize = Mathf.Atan2(target.physicalRadius, offset.magnitude) * Mathf.Rad2Deg * 2f;
+
+                        TutorialLabel.instance.HideLabel();
+                        TutorialLabel.instance.DisplayLabel($"{Main.aiGunnerName}: Targeting: {target.actorName}({offset.magnitude}m)(radius {target.physicalRadius}m)({angularSize} degrees ({(angularSize/GunnerAIConfig.minimumTargetSizeAngular)*100f}%)) with {attackBehaviour.Name}",
+                            null,
+                            5f);
+
+                        Debug.Log($"{Main.aiGunnerName}: New strat is to engage {target.actorName}({offset.magnitude}m)(radius {target.physicalRadius}m)({angularSize} degrees ({(angularSize / GunnerAIConfig.minimumTargetSizeAngular) * 100f}%)) with {attackBehaviour.Name}");
+                        Debug.Log($"{wm.equips.Count(e => e is HPEquipGunTurret turret)} gun turrets were available");
+                        Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsNotOpticalFaf(ml))} optical launchers were available");
+                        Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsOpticalFaf(ml))} optical faf launchers were available");
+                        Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsGuidedRocketLauncher(ml))} guided rocket launchers were available");
+                        Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsTow(ml))} tow were available");
+
+                        /*
+                        foreach (AttackBehaviour attackBehaviour in attackBehaviourShortlist)
+                        {
+                            Debug.Log($"Behaviour {attackBehaviour.Name}, HasAmmo: {attackBehaviour.HaveAmmo()}, AppropriateTarget: {attackBehaviour.AppropriateTarget(target)}, CanAttackImmediately: {attackBehaviour.CanAttackImmediately(target)}");
+                        }
+                        */
+                    }
                 }
-                */
             }
 
             sequence.UpdateState();
@@ -225,12 +241,7 @@ namespace AIHelicopterGunner.Components
             IEnumerable<Actor> sortedTarget = TargetManager.instance.enemyUnits
                 .Where(u => u.alive
                     && missileHelper.GetMissilesForTarget(u) == 0
-                    && !Physics.Raycast(transform.position,
-                    u.position - transform.position,
-                    out RaycastHit hit,
-                    (u.position - transform.position).magnitude - 5f,
-                    1,
-                    QueryTriggerInteraction.Ignore))
+                    && DetermineVisible(u))
                 .OrderByDescending(u => CalculateThreat(u.position));
 
             Actor target = sortedTarget.FirstOrDefault(u => attackBehaviourShortlist.Any(a => a.AppropriateTarget(u) && a.CanAttackTarget(u) && a.CanAttackImmediately(u)));
@@ -251,6 +262,21 @@ namespace AIHelicopterGunner.Components
 
             outTtarget = null;
             outAttackBehaviour = null;
+        }
+
+        public bool DetermineVisible(Actor actor)
+        {
+            Vector3 offset = actor.position - transform.position;
+            float angularSize = Mathf.Atan2(actor.physicalRadius, offset.magnitude) * Mathf.Rad2Deg * 2f;
+
+            return angularSize > GunnerAIConfig.minimumTargetSizeAngular
+                && !Physics.Raycast(transform.position,
+                    offset,
+                    out RaycastHit hit,
+                    offset.magnitude - 5f,
+                    1,
+                    QueryTriggerInteraction.Ignore)
+                && !TargetManager.IsOccludedByClouds(transform.position, actor.position, 2.2f);
         }
 
         public bool InFov(Vector3 position, float fov)

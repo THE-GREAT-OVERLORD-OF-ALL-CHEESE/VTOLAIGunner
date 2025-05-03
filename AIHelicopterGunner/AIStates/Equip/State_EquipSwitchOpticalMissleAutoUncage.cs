@@ -1,7 +1,6 @@
 ﻿using System;
-using UnityEngine;
 
-namespace AIHelicopterGunner.AIStates.WM
+namespace AIHelicopterGunner.AIStates.Equip
 {
     public class State_EquipSwitchOpticalMissleAutoUncage : AITryState
     {

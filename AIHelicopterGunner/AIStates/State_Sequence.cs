@@ -17,6 +17,8 @@ namespace AIHelicopterGunner.AIStates
         public override string Name { get; }
         public override float WarmUp { get; }
         public override float CoolDown { get; }
+        
+        public bool Idle => currentState == null;
 
         public State_Sequence(List<AITryState> states, string name, float warmUp, float coolDown)
         {
