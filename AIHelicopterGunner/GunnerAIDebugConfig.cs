@@ -1,6 +1,5 @@
-﻿namespace AIHelicopterGunner
+﻿namespace CheeseMods.AIHelicopterGunner;
+
+internal class GunnerAIDebugConfig
 {
-    internal class GunnerAIDebugConfig
-    {
-    }
 }

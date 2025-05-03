@@ -1,41 +1,40 @@
-﻿namespace AIHelicopterGunner.AIStates.Power
+﻿namespace CheeseMods.AIHelicopterGunner.AIStates.Power;
+
+public class State_MasterArmOn : AITryState
 {
-    public class State_MasterArmOn : AITryState
+    private WeaponManager wm;
+
+    public override string Name => "Switching Master Arm On";
+    public override float WarmUp => 1f;
+    public override float CoolDown => 0.5f;
+
+    public State_MasterArmOn(WeaponManager wm)
     {
-        private WeaponManager wm;
+        this.wm = wm;
+    }
 
-        public override string Name => "Switching Master Arm On";
-        public override float WarmUp => 1f;
-        public override float CoolDown => 0.5f;
+    public override bool CanStart()
+    {
+        return !wm.isMasterArmed;
+    }
 
-        public State_MasterArmOn(WeaponManager wm)
-        {
-            this.wm = wm;
-        }
+    public override void StartState()
+    {
+        wm.ToggleMasterArmed();
+    }
 
-        public override bool CanStart()
-        {
-            return !wm.isMasterArmed;
-        }
+    public override void UpdateState()
+    {
+        throw new System.NotImplementedException();
+    }
 
-        public override void StartState()
-        {
-            wm.ToggleMasterArmed();
-        }
+    public override bool IsOver()
+    {
+        return true;
+    }
 
-        public override void UpdateState()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override bool IsOver()
-        {
-            return true;
-        }
-
-        public override void EndState()
-        {
-            //Do Nothing
-        }
+    public override void EndState()
+    {
+        //Do Nothing
     }
 }
