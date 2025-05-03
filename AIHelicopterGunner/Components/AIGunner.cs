@@ -43,6 +43,8 @@ public class AIGunner : MonoBehaviour
         mfd = GetComponentInChildren<MFD>(true);
         tgpMfd = GetComponentInChildren<TargetingMFDPage>(true);
 
+        gameObject.AddComponent<DamageReporter>();
+        
         var ensurePower = new State_Sequence(
             new List<AITryState>
             {

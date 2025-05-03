@@ -1,106 +1,52 @@
-using UnityEngine;
 using System.Collections.Generic;
-using VTOLVR;
+using System.Linq;
+using UnityEngine;
 
-namespace AIHelicopterGunner
+namespace AIHelicopterGunner.Components
 {
     public class DamageReporter : MonoBehaviour
     {
-        private enum HealthLevel
+        private List<HealthDamageTracker> healthDamageTrackers = new List<HealthDamageTracker>();
+        
+        private void Awake()
         {
-            Healthy,
-            Minor,
-            Moderate,
-            Critical,
-            Destroyed
+            healthDamageTrackers = GetComponentsInChildren<Health>(true).Select(h => new HealthDamageTracker(h)).ToList();
         }
 
-        private class DamageState
+        private void Update()
         {
-            public HealthLevel lastLevel = HealthLevel.Healthy;
-        }
-
-        // These are the names of the child GameObjects under "Components" that have Health scripts
-        private readonly string[] partNames = new string[]
-        {
-            "APU",
-            "MainRotorPart",
-            "LeftWingPart",
-            "RightWingPart",
-            "TailPart",
-            "TurbineEngine1",
-            "TurbineEngine2"
-        };
-
-        private Dictionary<string, Health> partHealths = new();
-        private Dictionary<string, DamageState> partStates = new();
-
-        void Start()
-        {
-            foreach (string partName in partNames)
+            foreach (HealthDamageTracker healthDamageTracker in healthDamageTrackers)
             {
-                // Find the GameObject by name inside "Components"
-                Transform partTransform = transform.Find($"Components/{partName}");
-                if (partTransform)
-                {
-                    Health health = partTransform.GetComponent<Health>();
-                    if (health)
-                    {
-                        partHealths[partName] = health;
-                        partStates[partName] = new DamageState();
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"[DamageReporter] Health script missing on {partName}");
-                    }
-                }
-                else
-                {
-                    Debug.LogWarning($"[DamageReporter] Could not find Components/{partName}");
-                }
+                healthDamageTracker.CheckDamage();
             }
         }
+    }
 
-        void Update()
+    public class HealthDamageTracker
+    {
+        public Health health;
+        public bool reportedDamage;
+        public HealthDamageTracker(Health health)
         {
-            foreach (var kvp in partHealths)
-            {
-                string partName = kvp.Key;
-                Health health = kvp.Value;
-                float hp = health.normalizedHealth;
-                DamageState state = partStates[partName];
-
-                HealthLevel newLevel = GetHealthLevel(hp);
-                if (newLevel != state.lastLevel)
-                {
-                    state.lastLevel = newLevel;
-
-                    string message = newLevel switch
-                    {
-                        HealthLevel.Minor => $"{Main.aiGunnerName}: {partName} has minor damage.",
-                        HealthLevel.Moderate => $"{Main.aiGunnerName}: {partName} moderately damaged.",
-                        HealthLevel.Critical => $"{Main.aiGunnerName}: {partName} critically damaged!",
-                        HealthLevel.Destroyed => $"{Main.aiGunnerName}: {partName} is destroyed!",
-                        _ => null
-                    };
-
-                    if (!string.IsNullOrEmpty(message))
-                    {
-                        TutorialLabel.instance.HideLabel();
-                        TutorialLabel.instance.DisplayLabel(message, null, 5f);
-                        Debug.Log(message);
-                    }
-                }
-            }
+            this.health = health;
+            
         }
 
-        private HealthLevel GetHealthLevel(float hp)
+        public void CheckDamage()
         {
-            if (hp <= 0f) return HealthLevel.Destroyed;
-            if (hp <= 0.25f) return HealthLevel.Critical;
-            if (hp <= 0.5f) return HealthLevel.Moderate;
-            if (hp <= 0.75f) return HealthLevel.Minor;
-            return HealthLevel.Healthy;
+            if (reportedDamage)
+                return;
+
+            if (health.isDead)
+            {
+                Debug.Log($"{health.gameObject.name} has bit the dust");
+                TutorialLabel.instance.HideLabel();
+                TutorialLabel.instance.DisplayLabel(
+                    $"{Main.aiGunnerName}: {health.gameObject.name} is destroyed",
+                    null,
+                    5f);
+                reportedDamage = true;
+            }
         }
     }
 }
