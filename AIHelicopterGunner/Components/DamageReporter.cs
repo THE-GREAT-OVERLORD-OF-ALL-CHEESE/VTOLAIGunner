@@ -55,12 +55,12 @@ namespace AIHelicopterGunner.Components
                 string name = health.gameObject.name;
 
                 // Use friendly name if available
-                if (friendlyNames.TryGetValue(name, out var friendlyName))
+                if (friendlyNames.TryGetValue(name, out string friendlyName))
                 {
                     name = friendlyName;
                 }
 
-                Debug.Log($"{name} has bit the dust uwu");
+                Debug.Log($"{name} has bit the dust");
 
                 TutorialLabel.instance.HideLabel();
                 TutorialLabel.instance.DisplayLabel(
