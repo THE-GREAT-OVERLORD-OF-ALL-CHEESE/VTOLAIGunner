@@ -24,10 +24,9 @@ namespace CheeseMods.AIHelicopterGunner.Components
         }
     }
 
-    public class HealthDamageTracker
+    public class HealthDamageTracker(Health health)
     {
-        public Health health;
-        public bool reportedDamage;
+        private bool reportedDamage;
 
         private static readonly Dictionary<string, string> friendlyNames = new()
         {
@@ -40,11 +39,6 @@ namespace CheeseMods.AIHelicopterGunner.Components
             { "TailPart", "Tail" },
             { "MainRotorPart", "Main Rotor" }
         };
-
-        public HealthDamageTracker(Health health)
-        {
-            this.health = health;
-        }
 
         public void CheckDamage()
         {
@@ -75,7 +69,7 @@ namespace CheeseMods.AIHelicopterGunner.Components
         }
         public void CheckRepair()
         {
-            i (!health.isDead)
+            if (!health.isDead)
             {
                 string name = health.gameObject.name;
 
