@@ -1,27 +1,76 @@
-using AIHelicopterGunner.AIHelpers;
-using AIHelicopterGunner.AIStates;
-using AIHelicopterGunner.AIStates.MFDStates;
-using AIHelicopterGunner.AIStates.Power;
-using AIHelicopterGunner.AIStates.TGP;
-using AIHelicopterGunner.AIStates.WM;
-using AIHelicopterGunner.AttackBehaviours;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using VTOLVR.DLC.Rotorcraft;
-using VTOLVR.Multiplayer;
 
-namespace AIHelicopterGunner.Components;
-
-public class DamageReporter : MonoBehaviour
+namespace AIHelicopterGunner.Components
 {
-    private Health.DamageTypes DamageType;
-    private Health.DamageEvent DamageEvent;
-    private Health.DamageCreditDelegate DamageCreditDelegate;
-    private DamageEngineOnRotorCollision DamageEngineOnRotorCollision;
-    private RotorRPMObjectSwitch.DamageGroup RotorRPMObjectSwitch;
-    private ConstantDamage ConstantDamage;
-    private VehiclePart.DamageStepEvent vehicleDamageStepEvent;
-    private DamageSync DamageSync;
-    private RotorDamageSync RotorDamageSync;
+    public class DamageReporter : MonoBehaviour
+    {
+        private List<HealthDamageTracker> healthDamageTrackers = new List<HealthDamageTracker>();
+
+        private void Awake()
+        {
+            healthDamageTrackers = GetComponentsInChildren<Health>(true)
+                .Select(h => new HealthDamageTracker(h)).ToList();
+        }
+
+        private void Update()
+        {
+            foreach (HealthDamageTracker tracker in healthDamageTrackers)
+            {
+                tracker.CheckDamage();
+            }
+        }
+    }
+
+    public class HealthDamageTracker
+    {
+        public Health health;
+        public bool reportedDamage;
+
+        private static readonly Dictionary<string, string> friendlyNames = new()
+        {
+            { "TurbineEngine 1", "Engine 1" },
+            { "TurbineEngine 2", "Engine 2" },
+            { "apu", "APU" },
+            { "RightWingPart", "Right Wing" },
+            { "LeftWingPart", "Left Wing" },
+            { "TailRotorPart", "Tail Rotor" },
+            { "TailPart", "Tail" },
+            { "MainRotorPart", "Main Rotor" }
+        };
+
+        public HealthDamageTracker(Health health)
+        {
+            this.health = health;
+        }
+
+        public void CheckDamage()
+        {
+            if (reportedDamage)
+                return;
+
+            if (health.isDead)
+            {
+                string name = health.gameObject.name;
+
+                // Use friendly name if available
+                if (friendlyNames.TryGetValue(name, out string friendlyName))
+                {
+                    name = friendlyName;
+                }
+
+                Debug.Log($"{name} has bit the dust");
+
+                TutorialLabel.instance.HideLabel();
+                TutorialLabel.instance.DisplayLabel(
+                    $"{Main.aiGunnerName}: {name} is destroyed",
+                    null,
+                    5f
+                );
+
+                reportedDamage = true;
+            }
+        }
+    }
 }

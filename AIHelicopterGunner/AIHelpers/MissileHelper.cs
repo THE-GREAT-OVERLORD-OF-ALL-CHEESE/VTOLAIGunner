@@ -2,101 +2,100 @@
 using System.Linq;
 using UnityEngine;
 
-namespace AIHelicopterGunner.AIHelpers
+namespace CheeseMods.AIHelicopterGunner.AIHelpers;
+
+public class MissileHelper
 {
-    public class MissileHelper
+    public class MissilesPerTarget
     {
-        public class MissilesPerTarget
+        public Actor target;
+        public List<Missile> missiles;
+
+        public MissilesPerTarget(Actor target, Missile missile)
         {
-            public Actor target;
-            public List<Missile> missiles;
-
-            public MissilesPerTarget(Actor target, Missile missile)
-            {
-                this.target = target;
-                missiles = new List<Missile> { missile };
-                Debug.Log($"{missiles.Count} missiles on target {target.actorName}");
-            }
-
-            public void AddMissile(Missile missile)
-            {
-                missiles.Add(missile);
-                Debug.Log($"{missiles.Count} missiles on target {target.actorName}");
-            }
-
-            public void UpdateMissilesPerTarget()
-            {
-                missiles.RemoveAll(item => item == null);
-            }
+            this.target = target;
+            missiles = new List<Missile> { missile };
+            Debug.Log($"{missiles.Count} missiles on target {target.actorName}");
         }
 
-        private List<MissilesPerTarget> missilesPerTargets = new List<MissilesPerTarget>();
-
-        public void ReportMissilePerTarget(Actor target, Missile missile)
+        public void AddMissile(Missile missile)
         {
-            MissilesPerTarget missilesPerTarget = missilesPerTargets.FirstOrDefault(t => t.target == target);
-            if (missilesPerTarget != null)
-            {
-                Debug.Log($"New missile for existing target {target.actorName}");
-                missilesPerTarget.AddMissile(missile);
-                return;
-            }
-
-            missilesPerTargets.Add(new MissilesPerTarget(target, missile));
-            Debug.Log($"New missile for new target {target.actorName}");
+            missiles.Add(missile);
+            Debug.Log($"{missiles.Count} missiles on target {target.actorName}");
         }
 
-        public void UpdateMissilePerTarget()
+        public void UpdateMissilesPerTarget()
         {
-            foreach (MissilesPerTarget mpt in missilesPerTargets)
-            {
-                mpt.UpdateMissilesPerTarget();
-            }
+            missiles.RemoveAll(item => item == null);
+        }
+    }
 
-            MissilesPerTarget missilesPerTarget = missilesPerTargets.FirstOrDefault(t => t.target == null || !t.target.alive || !t.missiles.Any());
-            if (missilesPerTarget != null)
-            {
-                missilesPerTargets.Remove(missilesPerTarget);
-                Debug.Log($"No more missiles for target {missilesPerTarget.target.actorName}");
-            }
+    private List<MissilesPerTarget> missilesPerTargets = new List<MissilesPerTarget>();
+
+    public void ReportMissilePerTarget(Actor target, Missile missile)
+    {
+        MissilesPerTarget missilesPerTarget = missilesPerTargets.FirstOrDefault(t => t.target == target);
+        if (missilesPerTarget != null)
+        {
+            Debug.Log($"New missile for existing target {target.actorName}");
+            missilesPerTarget.AddMissile(missile);
+            return;
         }
 
-        public int GetMissilesForTarget(Actor target)
+        missilesPerTargets.Add(new MissilesPerTarget(target, missile));
+        Debug.Log($"New missile for new target {target.actorName}");
+    }
+
+    public void UpdateMissilePerTarget()
+    {
+        foreach (MissilesPerTarget mpt in missilesPerTargets)
         {
-            MissilesPerTarget missilesPerTarget = missilesPerTargets.FirstOrDefault(t => t.target == target);
-            if (missilesPerTarget != null)
-            {
-                return missilesPerTarget.missiles.Count();
-            }
-            return 0;
+            mpt.UpdateMissilesPerTarget();
         }
 
-        public static bool IsNotOpticalFaf(HPEquipOpticalML ml)
+        MissilesPerTarget missilesPerTarget = missilesPerTargets.FirstOrDefault(t => t.target == null || !t.target.alive || !t.missiles.Any());
+        if (missilesPerTarget != null)
         {
-            return ml.ml.GetNextMissile() != null
-                && ml.ml.GetNextMissile()?.opticalFAF == false
-                && ml.fullName.ToLower().Contains("agm-27") == false
-                && ml.fullName.ToLower().Contains("tow") == false;
+            missilesPerTargets.Remove(missilesPerTarget);
+            Debug.Log($"No more missiles for target {missilesPerTarget.target.actorName}");
         }
+    }
 
-        public static bool IsOpticalFaf(HPEquipOpticalML ml)
+    public int GetMissilesForTarget(Actor target)
+    {
+        MissilesPerTarget missilesPerTarget = missilesPerTargets.FirstOrDefault(t => t.target == target);
+        if (missilesPerTarget != null)
         {
-            return ml.ml.GetNextMissile() != null
-                && ml.ml.GetNextMissile().opticalFAF;
+            return missilesPerTarget.missiles.Count();
         }
+        return 0;
+    }
 
-        public static bool IsGuidedRocketLauncher(HPEquipOpticalML ml)
-        {
-            return ml.ml.GetNextMissile() != null
-                && ml.ml.GetNextMissile()?.opticalFAF == false
-                && ml.fullName.ToLower().Contains("agm-27");
-        }
+    public static bool IsNotOpticalFaf(HPEquipOpticalML ml)
+    {
+        return ml.ml.GetNextMissile() != null
+            && ml.ml.GetNextMissile()?.opticalFAF == false
+            && ml.fullName.ToLower().Contains("agm-27") == false
+            && ml.fullName.ToLower().Contains("tow") == false;
+    }
 
-        public static bool IsTow(HPEquipOpticalML ml)
-        {
-            return ml.ml.GetNextMissile() != null
-                && ml.ml.GetNextMissile()?.opticalFAF == false
-                && ml.fullName.ToLower().Contains("tow");
-        }
+    public static bool IsOpticalFaf(HPEquipOpticalML ml)
+    {
+        return ml.ml.GetNextMissile() != null
+            && ml.ml.GetNextMissile().opticalFAF;
+    }
+
+    public static bool IsGuidedRocketLauncher(HPEquipOpticalML ml)
+    {
+        return ml.ml.GetNextMissile() != null
+            && ml.ml.GetNextMissile()?.opticalFAF == false
+            && ml.fullName.ToLower().Contains("agm-27");
+    }
+
+    public static bool IsTow(HPEquipOpticalML ml)
+    {
+        return ml.ml.GetNextMissile() != null
+            && ml.ml.GetNextMissile()?.opticalFAF == false
+            && ml.fullName.ToLower().Contains("tow");
     }
 }

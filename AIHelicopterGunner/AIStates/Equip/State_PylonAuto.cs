@@ -1,30 +1,29 @@
 ﻿using System;
+using VTOLVR.DLC.Rotorcraft;
 
-namespace CheeseMods.AIHelicopterGunner.AIStates.TGP;
+namespace CheeseMods.AIHelicopterGunner.AIStates.Equip;
 
-public class State_TGPPagePowerOn : AITryState
+internal class State_PylonAuto : AITryState
 {
-    private TargetingMFDPage tgpMfd;
+    private ArticulatingHardpoint autopylon;
 
-
-    public override string Name => "Switching On TGP";
-
+    public override string Name => "Pylon Elevation Set To Auto";
     public override float WarmUp => 0.5f;
     public override float CoolDown => 0.5f;
 
-    public State_TGPPagePowerOn(TargetingMFDPage tgpMfd)
+    public State_PylonAuto(ArticulatingHardpoint autopylon)
     {
-        this.tgpMfd = tgpMfd;
+        this.autopylon = autopylon;
     }
 
     public override bool CanStart()
     {
-        return !tgpMfd.powered;
+        return autopylon != null && autopylon.autoMode == false;
     }
 
     public override void StartState()
     {
-        tgpMfd.TGPPwrButton();
+        autopylon.autoMode = true;
     }
 
     public override void UpdateState()
