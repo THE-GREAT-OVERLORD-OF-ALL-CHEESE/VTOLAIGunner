@@ -47,8 +47,9 @@ public class AIGunner : MonoBehaviour
         wm = GetComponentInChildren<WeaponManager>(true);
         mfd = GetComponentInChildren<MFD>(true);
         tgpMfd = GetComponentInChildren<TargetingMFDPage>(true);
-
+        gameObject.AddComponent<DamageReporter>();
         autoPylon = GetComponentInChildren<ArticulatingHardpoint>(true);
+        
 
         State_Sequence ensurePower = new State_Sequence(
             new List<AITryState>
