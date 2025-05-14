@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace AIHelicopterGunner.Components
+namespace CheeseMods.AIHelicopterGunner.Components
 {
     public class DamageReporter : MonoBehaviour
     {
@@ -19,14 +19,14 @@ namespace AIHelicopterGunner.Components
             foreach (HealthDamageTracker tracker in healthDamageTrackers)
             {
                 tracker.CheckDamage();
+                tracker.CheckRepair();
             }
         }
     }
 
-    public class HealthDamageTracker
+    public class HealthDamageTracker(Health health)
     {
-        public Health health;
-        public bool reportedDamage;
+        private bool reportedDamage;
 
         private static readonly Dictionary<string, string> friendlyNames = new()
         {
@@ -39,11 +39,6 @@ namespace AIHelicopterGunner.Components
             { "TailPart", "Tail" },
             { "MainRotorPart", "Main Rotor" }
         };
-
-        public HealthDamageTracker(Health health)
-        {
-            this.health = health;
-        }
 
         public void CheckDamage()
         {
@@ -70,6 +65,23 @@ namespace AIHelicopterGunner.Components
                 );
 
                 reportedDamage = true;
+            } 
+        }
+        public void CheckRepair()
+        {
+            if (!health.isDead)
+            {
+                string name = health.gameObject.name;
+
+                //use easy to read name
+                if (friendlyNames.TryGetValue(name, out string friendlyName))
+                {
+                    name = friendlyName;
+                }
+
+                Debug.Log($"{name} has been the repaired");
+
+                reportedDamage = false;
             }
         }
     }
