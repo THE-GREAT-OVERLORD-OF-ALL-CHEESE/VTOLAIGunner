@@ -1,38 +1,39 @@
 ﻿using CheeseMods.AIHelicopterGunner.Character;
+using VTOLVR.DLC.Rotorcraft;
 
 namespace CheeseMods.AIHelicopterGunner.AIStates.Power;
 
-public class State_APUStart : AITryState
+public class State_EngineThrottleFull : AITryState
 {
-    private AuxilliaryPowerUnit apu;
+    private HeliPowerGovernor governor;
     private IVoice voice;
 
-    public override string Name => "Switching on APU";
+    public override string Name => "Set Power To Full";
 
     public override float WarmUp => 1f;
 
     public override float CoolDown => 3f;
 
-    public State_APUStart(AuxilliaryPowerUnit apu, IVoice voice)
+    public State_EngineThrottleFull(HeliPowerGovernor governor, IVoice voice)
     {
-        this.apu = apu;
+        this.governor = governor;
         this.voice = voice;
     }
 
     public override bool CanStart()
     {
-        return !apu.powerEnabled && !apu.destroyed;
+        return governor.currentThrottleLimit < 1f;
     }
 
     public override void StartState()
     {
-        apu.PowerUp();
-        voice.Say($"Starting APU");
+        governor.SetThrottleLimit(1f);
+        voice.Say($"Throttle to Full");
     }
 
     public override void UpdateState()
     {
-
+        //Do Nothing
     }
 
     public override bool IsOver()

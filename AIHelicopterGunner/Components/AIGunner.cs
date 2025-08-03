@@ -6,6 +6,8 @@ using CheeseMods.AIHelicopterGunner.AIStates.Power;
 using CheeseMods.AIHelicopterGunner.AIStates.TGP;
 using CheeseMods.AIHelicopterGunner.AIStates.WM;
 using CheeseMods.AIHelicopterGunner.AttackBehaviours;
+using CheeseMods.AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunner.Spotting;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -18,8 +20,13 @@ public class AIGunner : MonoBehaviour
     private Battery battery;
     private AuxilliaryPowerUnit apu;
     private WeaponManager wm;
+    private FlightInfo flightInfo;
     private MFD mfd;
     private TargetingMFDPage tgpMfd;
+    private HelicopterRotor rotor;
+    private RotorBrake rotorBrake;
+    private List<TurbineStarterMotor> starterMotors;
+    private HeliPowerGovernor governor;
 
     private ArticulatingHardpoint autoPylon;
 
@@ -31,12 +38,16 @@ public class AIGunner : MonoBehaviour
     private State_Sequence guidedRocket;
     private State_Sequence tow;
 
+    public TargetMetaDataManager metaDataManager = new TargetMetaDataManager();
+    public GunnerTargetSpotter targetSpotter;
     public Actor target;
     public MissileHelper missileHelper = new MissileHelper();
     public List<AttackBehaviour> attackBehaviours = new List<AttackBehaviour>();
 
     private Actor lastTarget;
     private AttackBehaviour lastAttackBehviour;
+
+    public IVoice voice = new TutorialTextVoice();
 
     private void Awake()
     {
@@ -45,18 +56,33 @@ public class AIGunner : MonoBehaviour
         battery = GetComponentInChildren<Battery>(true);
         apu = GetComponentInChildren<AuxilliaryPowerUnit>(true);
         wm = GetComponentInChildren<WeaponManager>(true);
+        flightInfo = GetComponentInChildren<FlightInfo>(true);
         mfd = GetComponentInChildren<MFD>(true);
         tgpMfd = GetComponentInChildren<TargetingMFDPage>(true);
-        gameObject.AddComponent<DamageReporter>();
+        starterMotors = GetComponentsInChildren<TurbineStarterMotor>(true).ToList();
+        rotor = GetComponentInChildren<HelicopterRotor>(true);
+        rotorBrake = GetComponentInChildren<RotorBrake>(true);
+        governor = GetComponentInChildren<HeliPowerGovernor>(true);
+        ContactReporter contactReporter = gameObject.AddComponent<ContactReporter>();
+        DamageReporter damageReporter = gameObject.AddComponent<DamageReporter>();
+        damageReporter.voice = voice;
         autoPylon = GetComponentInChildren<ArticulatingHardpoint>(true);
-        
+
+        targetSpotter = new GunnerTargetSpotter(metaDataManager, transform, missileHelper);
 
         State_Sequence ensurePower = new State_Sequence(
             new List<AITryState>
             {
-                new State_APUStart(apu),
+                new State_APUStart(apu, voice),
                 new State_MasterPowerOn(battery),
                 new State_MasterArmOn(wm),
+
+                new State_EngineThrottleIdle(governor, voice),
+                new State_EngineStart(starterMotors[0], new List<TurbineStarterMotor>(), voice, "Engine 1"),
+                new State_EngineStart(starterMotors[1], new List<TurbineStarterMotor>(){ starterMotors[0] }, voice, "Engine 2"),
+                new State_RotorUnfold(rotor, voice),
+                new State_RotorBrakeOff(rotorBrake, voice),
+                new State_EngineThrottleFull(governor, voice),
             },
             "Ensure Power",
             1f,
@@ -85,7 +111,7 @@ public class AIGunner : MonoBehaviour
                 ensurePower,
                 tgpSlewToTarget,
                 new State_WMCycleWeapon(wm, typeof(HPEquipGunTurret)),
-                new State_WMFireGunTPGLock(wm, tgpMfd),
+                new State_WMFireGunTPGLock(wm, tgpMfd, voice),
                 tgpSlewToTarget
             },
             "Engage with Cannon",
@@ -101,7 +127,7 @@ public class AIGunner : MonoBehaviour
                 new State_WMCycleWeaponOpticalMissile(wm),
                 new State_EquipSwitchOpticalMissleAutoUncage(wm, tgpMfd),
                 new State_PylonAuto(autoPylon),
-                new State_WMFireOpticalMissile(this, wm, tgpMfd),
+                new State_WMFireOpticalMissile(this, wm, tgpMfd, voice),
             },
             "Engage with Optical Missile",
             0f,
@@ -116,7 +142,7 @@ public class AIGunner : MonoBehaviour
                 new State_WMCycleWeaponOpticalMissileFaf(wm),
                 new State_EquipSwitchOpticalMissleAutoUncage(wm, tgpMfd),
                 new State_PylonAuto(autoPylon),
-                new State_WMFireOpticalMissileFaf(this, wm, tgpMfd),
+                new State_WMFireOpticalMissileFaf(this, wm, tgpMfd, voice),
             },
             "Engage with Optical Missile FaF",
             0f,
@@ -131,7 +157,7 @@ public class AIGunner : MonoBehaviour
                 new State_WMCycleWeaponGuidedRocket(wm),
                 new State_EquipSwitchOpticalMissleAutoUncage(wm, tgpMfd),
                 new State_PylonAuto(autoPylon),
-                new State_WMFireGuidedRocketSalvo(this, wm, tgpMfd),
+                new State_WMFireGuidedRocketSalvo(this, wm, tgpMfd, voice),
             },
             "Engage with Guided Rockets",
             0f,
@@ -146,7 +172,7 @@ public class AIGunner : MonoBehaviour
                 new State_WMCycleWeaponTOW(wm),
                 new State_EquipSwitchOpticalMissleAutoUncage(wm, tgpMfd),
                 new State_PylonAuto(autoPylon),
-                new State_WMFireOpticalMissile(this, wm, tgpMfd),
+                new State_WMFireOpticalMissile(this, wm, tgpMfd, voice),
             },
             "Engage with TOW Missile",
             0f,
@@ -155,10 +181,10 @@ public class AIGunner : MonoBehaviour
 
         attackBehaviours = new List<AttackBehaviour>()
         {
-            new AttackBehaviour_TOW(this, wm, tow, 100f),
-            new AttackBehaviour_GuidedRockets(this, wm, guidedRocket, 20f),
-            new AttackBehaviour_OpticalMissile(this, wm, opticalMissile, 100f),
-            new AttackBehaviour_OpticalMissileFaf(this, wm, opticalMissileFaf, 100f),
+            new AttackBehaviour_TOW(this, wm, flightInfo, tow, 100f),
+            new AttackBehaviour_GuidedRockets(this, wm, flightInfo, guidedRocket, 20f),
+            new AttackBehaviour_OpticalMissile(this, wm, flightInfo, opticalMissile, 100f),
+            new AttackBehaviour_OpticalMissileFaf(this, wm, flightInfo, opticalMissileFaf, 100f),
             new AttackBehaviour_Guns(this, wm, cannonSequence, 10f)
         };
 
@@ -167,6 +193,7 @@ public class AIGunner : MonoBehaviour
 
     private void Update()
     {
+        targetSpotter.UpdateVisibleTargets();
         missileHelper.UpdateMissilePerTarget();
 
         if (sequence.Idle)
@@ -186,10 +213,7 @@ public class AIGunner : MonoBehaviour
                     Vector3 offset = target.position - transform.position;
                     float angularSize = Mathf.Atan2(target.physicalRadius, offset.magnitude) * Mathf.Rad2Deg * 2f;
 
-                    TutorialLabel.instance.HideLabel();
-                    TutorialLabel.instance.DisplayLabel($"{Main.aiGunnerName}: Targeting: {target.actorName}({offset.magnitude}m)(radius {target.physicalRadius}m)({angularSize} degrees ({angularSize / GunnerAIConfig.minimumTargetSizeAngular * 100f}%)) with {attackBehaviour.Name}",
-                        null,
-                        5f);
+                    voice.Say($"{Main.aiGunnerName}: Targeting: {target.actorName}({offset.magnitude}m)(radius {target.physicalRadius}m)({angularSize} degrees ({angularSize / GunnerAIConfig.minimumTargetSizeAngular * 100f}%)) with {attackBehaviour.Name}");
 
                     Debug.Log($"{Main.aiGunnerName}: New strat is to engage {target.actorName}({offset.magnitude}m)(radius {target.physicalRadius}m)({angularSize} degrees ({angularSize / GunnerAIConfig.minimumTargetSizeAngular * 100f}%)) with {attackBehaviour.Name}");
                     Debug.Log($"{wm.equips.Count(e => e is HPEquipGunTurret turret)} gun turrets were available");
@@ -198,12 +222,24 @@ public class AIGunner : MonoBehaviour
                     Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsGuidedRocketLauncher(ml))} guided rocket launchers were available");
                     Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsTow(ml))} tow were available");
 
-                    /*
-                    foreach (AttackBehaviour attackBehaviour in attackBehaviourShortlist)
+
+                    IEnumerable<TargetMetaData> sortedTargets = targetSpotter.visibleTargets
+                        .Where(u => u.Actor != null
+                            && u.Alive
+                            && missileHelper.GetMissilesForTarget(u.Actor) == 0)
+                        .OrderByDescending(u => u.CanAttack && u.Hostile)
+                        .ThenByDescending(u => u.SpecialFlags.HasFlag(TargetTypeSpecial.Radar))
+                        .ThenByDescending(u => InRange(u.Actor.position, 0f, u.MaxRange))
+                        .ThenByDescending(u => u.SpecialFlags.HasFlag(TargetTypeSpecial.Missile))
+                        .ThenByDescending(u => u.Value)
+                        .ThenByDescending(u => CalculateThreat(u.Actor.position));
+
+                    Debug.Log($"Desired engagement order is ");
+                    foreach (TargetMetaData targetMetaData in sortedTargets)
                     {
-                        Debug.Log($"Behaviour {attackBehaviour.Name}, HasAmmo: {attackBehaviour.HaveAmmo()}, AppropriateTarget: {attackBehaviour.AppropriateTarget(target)}, CanAttackImmediately: {attackBehaviour.CanAttackImmediately(target)}");
+                        Debug.Log($"Target {targetMetaData.Actor.actorName}:");
+                        Debug.Log($"Can Attack: {targetMetaData.CanAttack}, Hostile: {targetMetaData.Hostile}, Has Radar: {targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Radar)}, In Range: {InRange(targetMetaData.Actor.position, 0f, targetMetaData.MaxRange)}, Has Missile: {targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Missile)}, Max Range: {targetMetaData.MaxRange}, Range {Range(targetMetaData.Actor.position)}, Value: {targetMetaData.Value}");
                     }
-                    */
                 }
             }
         }
@@ -219,9 +255,9 @@ public class AIGunner : MonoBehaviour
 
         if (tgpMfd.opticalTargeter.lockedActor != null && tgpMfd.opticalTargeter.lockedActor.alive)
         {
-            attackBehaviour = attackBehaviourShortlist.FirstOrDefault(a => a.AppropriateTarget(tgpMfd.opticalTargeter.lockedActor)
-                && a.CanAttackTarget(tgpMfd.opticalTargeter.lockedActor)
-                && a.CanAttackImmediately(tgpMfd.opticalTargeter.lockedActor));
+            attackBehaviour = attackBehaviourShortlist.FirstOrDefault(a => a.AppropriateTarget(tgpMfd.opticalTargeter.lockedActor, metaDataManager)
+                && a.CanAttackTarget(tgpMfd.opticalTargeter.lockedActor, metaDataManager)
+                && a.CanAttackImmediately(tgpMfd.opticalTargeter.lockedActor, metaDataManager));
             if (attackBehaviour != null)
             {
                 outTtarget = tgpMfd.opticalTargeter.lockedActor;
@@ -229,8 +265,8 @@ public class AIGunner : MonoBehaviour
                 return;
             }
 
-            attackBehaviour = attackBehaviourShortlist.FirstOrDefault(a => a.CanAttackTarget(tgpMfd.opticalTargeter.lockedActor)
-                && a.CanAttackImmediately(tgpMfd.opticalTargeter.lockedActor));
+            attackBehaviour = attackBehaviourShortlist.FirstOrDefault(a => a.CanAttackTarget(tgpMfd.opticalTargeter.lockedActor, metaDataManager)
+                && a.CanAttackImmediately(tgpMfd.opticalTargeter.lockedActor, metaDataManager));
             if (attackBehaviour != null)
             {
                 outTtarget = tgpMfd.opticalTargeter.lockedActor;
@@ -239,45 +275,35 @@ public class AIGunner : MonoBehaviour
             }
         }
 
-        IEnumerable<Actor> sortedTarget = TargetManager.instance.enemyUnits
-            .Where(u => u.alive
-                && missileHelper.GetMissilesForTarget(u) == 0
-                && DetermineVisible(u))
-            .OrderByDescending(u => CalculateThreat(u.position));
+        IEnumerable<TargetMetaData> sortedTargets = targetSpotter.visibleTargets
+            .Where(u => u.Actor != null
+                && u.Alive
+                && missileHelper.GetMissilesForTarget(u.Actor) == 0)
+            .OrderByDescending(u => u.CanAttack && u.Hostile)
+            .ThenByDescending(u => u.SpecialFlags.HasFlag(TargetTypeSpecial.Radar))
+            .ThenByDescending(u => InRange(u.Actor.position, 0f, u.MaxRange))
+            .ThenByDescending(u => u.SpecialFlags.HasFlag(TargetTypeSpecial.Missile))
+            .ThenByDescending(u => u.Value)
+            .ThenByDescending(u => CalculateThreat(u.Actor.position));
 
-        Actor target = sortedTarget.FirstOrDefault(u => attackBehaviourShortlist.Any(a => a.AppropriateTarget(u) && a.CanAttackTarget(u) && a.CanAttackImmediately(u)));
+        TargetMetaData target = sortedTargets.FirstOrDefault(u => attackBehaviourShortlist.Any(a => a.AppropriateTarget(u) && a.CanAttackTarget(u) && a.CanAttackImmediately(u)));
         if (target != null)
         {
-            outTtarget = target;
+            outTtarget = target.Actor;
             outAttackBehaviour = attackBehaviourShortlist.FirstOrDefault(a => a.AppropriateTarget(target) && a.CanAttackTarget(target) && a.CanAttackImmediately(target));
             return;
         }
 
-        target = sortedTarget.FirstOrDefault(u => attackBehaviourShortlist.Any(a => a.CanAttackTarget(u) && a.CanAttackImmediately(u)));
+        target = sortedTargets.FirstOrDefault(u => attackBehaviourShortlist.Any(a => a.CanAttackTarget(u) && a.CanAttackImmediately(u)));
         if (target != null)
         {
-            outTtarget = target;
+            outTtarget = target.Actor;
             outAttackBehaviour = attackBehaviourShortlist.FirstOrDefault(a => a.CanAttackTarget(target) && a.CanAttackImmediately(target));
             return;
         }
 
         outTtarget = null;
         outAttackBehaviour = null;
-    }
-
-    public bool DetermineVisible(Actor actor)
-    {
-        Vector3 offset = actor.position - transform.position;
-        float angularSize = Mathf.Atan2(actor.physicalRadius, offset.magnitude) * Mathf.Rad2Deg * 2f;
-
-        return angularSize > GunnerAIConfig.minimumTargetSizeAngular
-            && !Physics.Raycast(transform.position,
-                offset,
-                out RaycastHit hit,
-                offset.magnitude - 5f,
-                1,
-                QueryTriggerInteraction.Ignore)
-            && !TargetManager.IsOccludedByClouds(transform.position, actor.position, 2.2f);
     }
 
     public bool InFov(Vector3 position, float fov)
@@ -294,13 +320,18 @@ public class AIGunner : MonoBehaviour
 
     public bool InRange(Vector3 position, float minRange, float maxRange)
     {
-        Vector3 offset = position - transform.position;
-        return offset.magnitude > minRange && offset.magnitude < maxRange;
+        float range = Range(position);
+        return range > minRange && range < maxRange;
     }
 
     private float CalculateThreat(Vector3 position)
     {
+        return 1f / Range(position);
+    }
+
+    public float Range(Vector3 position)
+    {
         Vector3 offset = position - transform.position;
-        return 1f / offset.magnitude;
+        return offset.magnitude;
     }
 }

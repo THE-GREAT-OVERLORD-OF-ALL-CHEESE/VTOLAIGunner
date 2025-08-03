@@ -1,5 +1,6 @@
 ﻿using CheeseMods.AIHelicopterGunner.AIStates;
 using CheeseMods.AIHelicopterGunner.Components;
+using CheeseMods.AIHelicopterGunner.Spotting;
 
 namespace CheeseMods.AIHelicopterGunner.AttackBehaviours;
 
@@ -17,8 +18,21 @@ public abstract class AttackBehaviour
         Sequence = sequence;
     }
 
-    public abstract bool CanAttackTarget(Actor actor);
-    public abstract bool AppropriateTarget(Actor actor);
-    public abstract bool CanAttackImmediately(Actor actor);
+    public abstract bool CanAttackTarget(TargetMetaData target);
+    public abstract bool AppropriateTarget(TargetMetaData target);
+    public abstract bool CanAttackImmediately(TargetMetaData target);
     public abstract bool HaveAmmo();
+
+    public bool CanAttackTarget(Actor actor, TargetMetaDataManager manager)
+    {
+        return CanAttackTarget(manager.GetMetaData(actor));
+    }
+    public bool AppropriateTarget(Actor actor, TargetMetaDataManager manager)
+    {
+        return AppropriateTarget(manager.GetMetaData(actor));
+    }
+    public bool CanAttackImmediately(Actor actor, TargetMetaDataManager manager)
+    {
+        return CanAttackImmediately(manager.GetMetaData(actor));
+    }
 }

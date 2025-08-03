@@ -1,4 +1,4 @@
-﻿using CheeseMods.AIHelicopterGunner.AIStates;
+﻿using CheeseMods.AIHelicopterGunner.Character;
 using CheeseMods.AIHelicopterGunner.Components;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +11,7 @@ public class State_WMFireGuidedRocketSalvo : AITryState
     private AIGunner gunner;
     private WeaponManager wm;
     private TargetingMFDPage tgpMfd;
+    private IVoice voice;
 
     public override string Name => "Firing Guided Rocket Salvo";
     public override float WarmUp => 0.5f;
@@ -25,11 +26,12 @@ public class State_WMFireGuidedRocketSalvo : AITryState
 
     private List<Missile> missiles = new List<Missile>();
 
-    public State_WMFireGuidedRocketSalvo(AIGunner gunner, WeaponManager wm, TargetingMFDPage tgpMfd)
+    public State_WMFireGuidedRocketSalvo(AIGunner gunner, WeaponManager wm, TargetingMFDPage tgpMfd, IVoice voice)
     {
         this.gunner = gunner;
         this.wm = wm;
         this.tgpMfd = tgpMfd;
+        this.voice = voice;
     }
 
     public override bool CanStart()
@@ -66,6 +68,8 @@ public class State_WMFireGuidedRocketSalvo : AITryState
         }
 
         salvoLeft = Mathf.Clamp(Mathf.CeilToInt(tgpMfd.opticalTargeter.lockedActor.health.maxHealth / 30), 1, maxSalvoSize);
+
+        voice.Say("Rifle, keep lock");
     }
 
     public override void UpdateState()

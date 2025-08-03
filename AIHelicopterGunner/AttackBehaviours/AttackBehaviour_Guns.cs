@@ -1,5 +1,6 @@
 ﻿using CheeseMods.AIHelicopterGunner.AIStates;
 using CheeseMods.AIHelicopterGunner.Components;
+using CheeseMods.AIHelicopterGunner.Spotting;
 using System.Linq;
 
 namespace CheeseMods.AIHelicopterGunner.AttackBehaviours;
@@ -15,20 +16,20 @@ public class AttackBehaviour_Guns : AttackBehaviour
 
     private float damage;
 
-    public override bool AppropriateTarget(Actor actor)
+    public override bool AppropriateTarget(TargetMetaData target)
     {
-        return CanAttackTarget(actor);
+        return CanAttackTarget(target);
     }
 
-    public override bool CanAttackImmediately(Actor actor)
+    public override bool CanAttackImmediately(TargetMetaData target)
     {
-        return Gunner.InHFov(actor.position, AIGunnerConsts.gunFov)
-            && Gunner.InRange(actor.position, AIGunnerConsts.gunMinRange, AIGunnerConsts.gunMaxRange);
+        return Gunner.InHFov(target.Actor.position, AIGunnerConsts.gunFov)
+            && Gunner.InRange(target.Actor.position, AIGunnerConsts.gunMinRange, AIGunnerConsts.gunMaxRange);
     }
 
-    public override bool CanAttackTarget(Actor actor)
+    public override bool CanAttackTarget(TargetMetaData target)
     {
-        return actor.healthMinDamage < damage;
+        return target.Actor.healthMinDamage < damage;
     }
 
     public override bool HaveAmmo()

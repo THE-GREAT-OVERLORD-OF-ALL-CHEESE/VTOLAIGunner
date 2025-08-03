@@ -1,22 +1,23 @@
 ﻿using CheeseMods.AIHelicopterGunner.AIHelpers;
 using CheeseMods.AIHelicopterGunner.AIStates;
 using CheeseMods.AIHelicopterGunner.Components;
+using CheeseMods.AIHelicopterGunner.Spotting;
 using System.Linq;
 
 namespace CheeseMods.AIHelicopterGunner.AttackBehaviours;
 
 public class AttackBehaviour_GuidedRockets : AttackBehaviour_ATGM
 {
-    public AttackBehaviour_GuidedRockets(AIGunner gunner, WeaponManager weaponManager, State_Sequence sequence, float damage) : base(gunner, weaponManager, sequence, damage)
+    public AttackBehaviour_GuidedRockets(AIGunner gunner, WeaponManager weaponManager, FlightInfo flightInfo, State_Sequence sequence, float damage) : base(gunner, weaponManager, flightInfo, sequence, damage)
     {
     }
 
     public override string Name => "Guided Rocket";
 
-    public override bool CanAttackImmediately(Actor actor)
+    public override bool CanAttackImmediately(TargetMetaData target)
     {
-        return Gunner.InHFov(actor.position, AIGunnerConsts.guidedRocketImmediateFov)
-            && Gunner.InRange(actor.position, AIGunnerConsts.guidedRocketMinRange, AIGunnerConsts.guidedRocketMaxRange);
+        return Gunner.InHFov(target.Actor.position, AIGunnerConsts.guidedRocketImmediateFov)
+            && Gunner.InRange(target.Actor.position, AIGunnerConsts.guidedRocketMinRange, AIGunnerConsts.guidedRocketMaxRange);
     }
 
     public override bool HaveAmmo()

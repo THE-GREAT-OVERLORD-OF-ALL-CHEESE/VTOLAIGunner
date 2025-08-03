@@ -1,38 +1,39 @@
 ﻿using CheeseMods.AIHelicopterGunner.Character;
+using VTOLVR.DLC.Rotorcraft;
 
 namespace CheeseMods.AIHelicopterGunner.AIStates.Power;
 
-public class State_APUStart : AITryState
+public class State_RotorUnfold : AITryState
 {
-    private AuxilliaryPowerUnit apu;
+    private HelicopterRotor rotor;
     private IVoice voice;
 
-    public override string Name => "Switching on APU";
+    public override string Name => "Rotor Unfold";
 
     public override float WarmUp => 1f;
 
     public override float CoolDown => 3f;
 
-    public State_APUStart(AuxilliaryPowerUnit apu, IVoice voice)
+    public State_RotorUnfold(HelicopterRotor rotor, IVoice voice)
     {
-        this.apu = apu;
+        this.rotor = rotor;
         this.voice = voice;
     }
 
     public override bool CanStart()
     {
-        return !apu.powerEnabled && !apu.destroyed;
+        return rotor.foldSwitch == 1;
     }
 
     public override void StartState()
     {
-        apu.PowerUp();
-        voice.Say($"Starting APU");
+        rotor.SetFold(0);
+        voice.Say("Unfolding rotor");
     }
 
     public override void UpdateState()
     {
-
+        //Do Nothing
     }
 
     public override bool IsOver()

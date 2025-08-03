@@ -1,17 +1,19 @@
+using CheeseMods.AIHelicopterGunner.Character;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace AIHelicopterGunner.Components
+namespace CheeseMods.AIHelicopterGunner.Components
 {
     public class DamageReporter : MonoBehaviour
     {
+        public IVoice voice; 
         private List<HealthDamageTracker> healthDamageTrackers = new List<HealthDamageTracker>();
 
-        private void Awake()
+        private void Start()
         {
             healthDamageTrackers = GetComponentsInChildren<Health>(true)
-                .Select(h => new HealthDamageTracker(h)).ToList();
+                .Select(h => new HealthDamageTracker(h, voice)).ToList();
         }
 
         private void Update()
@@ -26,6 +28,7 @@ namespace AIHelicopterGunner.Components
     public class HealthDamageTracker
     {
         public Health health;
+        public IVoice voice;
         public bool reportedDamage;
 
         private static readonly Dictionary<string, string> friendlyNames = new()
@@ -40,36 +43,32 @@ namespace AIHelicopterGunner.Components
             { "MainRotorPart", "Main Rotor" }
         };
 
-        public HealthDamageTracker(Health health)
+        public HealthDamageTracker(Health health, IVoice voice)
         {
             this.health = health;
+            this.voice = voice;
         }
 
         public void CheckDamage()
         {
-            if (reportedDamage)
-                return;
-
-            if (health.isDead)
+            if (reportedDamage != health.isDead)
             {
-                string name = health.gameObject.name;
+                reportedDamage = health.isDead;
 
-                // Use friendly name if available
-                if (friendlyNames.TryGetValue(name, out string friendlyName))
+                if (health.isDead)
                 {
-                    name = friendlyName;
+                    string name = health.gameObject.name;
+
+                    // Use friendly name if available
+                    if (friendlyNames.TryGetValue(name, out string friendlyName))
+                    {
+                        name = friendlyName;
+                    }
+
+                    Debug.Log($"{name} has bit the dust");
+
+                    voice.Say($"{Main.aiGunnerName}: {name} is destroyed");
                 }
-
-                Debug.Log($"{name} has bit the dust");
-
-                TutorialLabel.instance.HideLabel();
-                TutorialLabel.instance.DisplayLabel(
-                    $"{Main.aiGunnerName}: {name} is destroyed",
-                    null,
-                    5f
-                );
-
-                reportedDamage = true;
             }
         }
     }

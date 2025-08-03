@@ -1,4 +1,4 @@
-﻿using CheeseMods.AIHelicopterGunner.AIStates;
+﻿using CheeseMods.AIHelicopterGunner.Character;
 using CheeseMods.AIHelicopterGunner.Components;
 using System;
 using UnityEngine;
@@ -10,6 +10,7 @@ public class State_WMFireOpticalMissileFaf : AITryState
     private AIGunner gunner;
     private WeaponManager wm;
     private TargetingMFDPage tgpMfd;
+    private IVoice voice;
 
     public override string Name => "Firing Optical Missile FaF";
     public override float WarmUp => 0.5f;
@@ -17,11 +18,12 @@ public class State_WMFireOpticalMissileFaf : AITryState
 
     private HPEquipOpticalML missileLauncher;
 
-    public State_WMFireOpticalMissileFaf(AIGunner gunner, WeaponManager wm, TargetingMFDPage tgpMfd)
+    public State_WMFireOpticalMissileFaf(AIGunner gunner, WeaponManager wm, TargetingMFDPage tgpMfd, IVoice voice)
     {
         this.gunner = gunner;
         this.wm = wm;
         this.tgpMfd = tgpMfd;
+        this.voice = voice;
     }
 
     public override bool CanStart()
@@ -52,6 +54,8 @@ public class State_WMFireOpticalMissileFaf : AITryState
     {
         gunner.missileHelper.ReportMissilePerTarget(tgpMfd.opticalTargeter.lockedActor, missileLauncher.ml.GetNextMissile());
         wm.StartFire();
+
+        voice.Say("Rifle, Break Break Break");
     }
 
     public override void UpdateState()
