@@ -1,4 +1,5 @@
 ﻿using CheeseMods.AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 using VTOLVR.DLC.Rotorcraft;
 
 namespace CheeseMods.AIHelicopterGunner.AIStates.Power;
@@ -28,7 +29,8 @@ public class State_EngineThrottleIdle : AITryState
     public override void StartState()
     {
         governor.SetThrottleLimit(governor.throttleIdleNotch);
-        voice.Say($"Throttle to Idle");
+
+        voice.Say(LineType.ThrottleToIdle);
     }
 
     public override void UpdateState()

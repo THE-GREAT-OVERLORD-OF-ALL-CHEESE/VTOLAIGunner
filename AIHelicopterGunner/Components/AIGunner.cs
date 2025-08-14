@@ -8,6 +8,7 @@ using CheeseMods.AIHelicopterGunner.AIStates.WM;
 using CheeseMods.AIHelicopterGunner.AttackBehaviours;
 using CheeseMods.AIHelicopterGunner.Character;
 using CheeseMods.AIHelicopterGunner.Spotting;
+using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -47,7 +48,7 @@ public class AIGunner : MonoBehaviour
     private Actor lastTarget;
     private AttackBehaviour lastAttackBehviour;
 
-    public IVoice voice = new TutorialTextVoice();
+    public IVoice voice;
 
     private void Awake()
     {
@@ -69,17 +70,18 @@ public class AIGunner : MonoBehaviour
         autoPylon = GetComponentInChildren<ArticulatingHardpoint>(true);
 
         targetSpotter = new GunnerTargetSpotter(metaDataManager, transform, missileHelper);
+        voice = new RadioCommsVoice(AssetLoader.voice);
 
         State_Sequence ensurePower = new State_Sequence(
             new List<AITryState>
             {
                 new State_APUStart(apu, voice),
-                new State_MasterPowerOn(battery),
-                new State_MasterArmOn(wm),
+                new State_MasterPowerOn(battery, voice),
+                new State_MasterArmOn(wm, voice),
 
                 new State_EngineThrottleIdle(governor, voice),
-                new State_EngineStart(starterMotors[0], new List<TurbineStarterMotor>(), voice, "Engine 1"),
-                new State_EngineStart(starterMotors[1], new List<TurbineStarterMotor>(){ starterMotors[0] }, voice, "Engine 2"),
+                new State_EngineStart(starterMotors[0], new List<TurbineStarterMotor>(), voice, "Engine 1", LineType.Engine1),
+                new State_EngineStart(starterMotors[1], new List<TurbineStarterMotor>(){ starterMotors[0] }, voice, "Engine 2", LineType.Engine2),
                 new State_RotorUnfold(rotor, voice),
                 new State_RotorBrakeOff(rotorBrake, voice),
                 new State_EngineThrottleFull(governor, voice),
@@ -94,7 +96,7 @@ public class AIGunner : MonoBehaviour
             {
                 new State_MFDSwitchOn(mfd),
                 new State_MFDSwitchTPGPage(mfd, tgpMfd),
-                new State_TGPPagePowerOn(tgpMfd),
+                new State_TGPPagePowerOn(tgpMfd, voice),
                 new State_TGPSlewFwd(tgpMfd, this),
                 new State_TGPZoomOut(tgpMfd, this),
                 new State_TGPZoomIn(tgpMfd, this),

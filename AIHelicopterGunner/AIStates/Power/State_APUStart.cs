@@ -1,4 +1,6 @@
-﻿using CheeseMods.AIHelicopterGunner.Character;
+﻿using AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 
 namespace CheeseMods.AIHelicopterGunner.AIStates.Power;
 
@@ -6,6 +8,8 @@ public class State_APUStart : AITryState
 {
     private AuxilliaryPowerUnit apu;
     private IVoice voice;
+
+    private Callout apuStartCallout;
 
     public override string Name => "Switching on APU";
 
@@ -17,6 +21,8 @@ public class State_APUStart : AITryState
     {
         this.apu = apu;
         this.voice = voice;
+
+        apuStartCallout = new Callout(1f, 15f, 1, () => voice.SaySystemStarting(LineType.APU));
     }
 
     public override bool CanStart()
@@ -27,7 +33,7 @@ public class State_APUStart : AITryState
     public override void StartState()
     {
         apu.PowerUp();
-        voice.Say($"Starting APU");
+        apuStartCallout.SayCallout();
     }
 
     public override void UpdateState()

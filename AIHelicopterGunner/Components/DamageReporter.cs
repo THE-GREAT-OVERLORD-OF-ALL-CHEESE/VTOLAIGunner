@@ -65,9 +65,21 @@ namespace CheeseMods.AIHelicopterGunner.Components
                         name = friendlyName;
                     }
 
-                    Debug.Log($"{name} has bit the dust");
-
-                    voice.Say($"{Main.aiGunnerName}: {name} is destroyed");
+                    switch (name)
+                    {
+                        case "Engine 1":
+                            voice.SaySystemDestroyed(AIHelicopterGunnerAssets.ScriptableObjects.LineType.Engine1);
+                            break;
+                        case "Engine 2":
+                            voice.SaySystemDestroyed(AIHelicopterGunnerAssets.ScriptableObjects.LineType.Engine2);
+                            break;
+                        case "APU":
+                            voice.SaySystemDestroyed(AIHelicopterGunnerAssets.ScriptableObjects.LineType.APU);
+                            break;
+                        default:
+                            voice.Say($"{name} is destroyed");
+                            break;
+                    }
                 }
             }
         }

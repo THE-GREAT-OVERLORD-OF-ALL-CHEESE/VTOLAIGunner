@@ -1,5 +1,6 @@
 ﻿using CheeseMods.AIHelicopterGunner.Character;
 using CheeseMods.AIHelicopterGunner.Components;
+using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -69,7 +70,7 @@ public class State_WMFireGuidedRocketSalvo : AITryState
 
         salvoLeft = Mathf.Clamp(Mathf.CeilToInt(tgpMfd.opticalTargeter.lockedActor.health.maxHealth / 30), 1, maxSalvoSize);
 
-        voice.Say("Rifle, keep lock");
+        voice.Say(LineType.Rifle);
     }
 
     public override void UpdateState()

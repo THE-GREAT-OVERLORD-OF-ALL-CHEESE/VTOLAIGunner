@@ -5,6 +5,8 @@ VisualStudioVersion = 17.11.35219.272
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AIHelicopterGunner", "AIHelicopterGunner\AIHelicopterGunner.csproj", "{418379B9-229B-4B2D-B371-4A26490AA040}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIHelicopterGunnerAssets", "AIHelicopterGunnerAssets\AIHelicopterGunnerAssets.csproj", "{B91E76D2-B092-4EC9-81CF-DC6F4055C1D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{418379B9-229B-4B2D-B371-4A26490AA040}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{418379B9-229B-4B2D-B371-4A26490AA040}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{418379B9-229B-4B2D-B371-4A26490AA040}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B91E76D2-B092-4EC9-81CF-DC6F4055C1D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B91E76D2-B092-4EC9-81CF-DC6F4055C1D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B91E76D2-B092-4EC9-81CF-DC6F4055C1D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B91E76D2-B092-4EC9-81CF-DC6F4055C1D9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

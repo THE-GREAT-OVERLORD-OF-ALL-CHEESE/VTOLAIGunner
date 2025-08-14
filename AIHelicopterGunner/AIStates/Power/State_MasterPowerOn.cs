@@ -1,4 +1,7 @@
-﻿namespace CheeseMods.AIHelicopterGunner.AIStates.Power;
+﻿using AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunner.Character;
+
+namespace CheeseMods.AIHelicopterGunner.AIStates.Power;
 
 public class State_MasterPowerOn : AITryState
 {
@@ -8,9 +11,12 @@ public class State_MasterPowerOn : AITryState
     public override float WarmUp => 1f;
     public override float CoolDown => 1f;
 
-    public State_MasterPowerOn(Battery battery)
+    public Callout masterPowerCallout;
+
+    public State_MasterPowerOn(Battery battery, IVoice voice)
     {
         this.battery = battery;
+        masterPowerCallout = new Callout(5f, 10f, 1, () => voice.Say("Master power on"));
     }
 
     public override bool CanStart()
@@ -21,6 +27,7 @@ public class State_MasterPowerOn : AITryState
     public override void StartState()
     {
         battery.ToggleConnection();
+        masterPowerCallout.SayCallout();
     }
 
     public override void UpdateState()

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunner.Character;
+using System;
 
 namespace CheeseMods.AIHelicopterGunner.AIStates.TGP;
 
@@ -12,9 +14,12 @@ public class State_TGPPagePowerOn : AITryState
     public override float WarmUp => 0.5f;
     public override float CoolDown => 0.5f;
 
-    public State_TGPPagePowerOn(TargetingMFDPage tgpMfd)
+    public Callout tgpCallout;
+
+    public State_TGPPagePowerOn(TargetingMFDPage tgpMfd, IVoice voice)
     {
         this.tgpMfd = tgpMfd;
+        tgpCallout = new Callout(5f, 10f, 1, () => voice.Say("I have TGP control"));
     }
 
     public override bool CanStart()
@@ -25,6 +30,7 @@ public class State_TGPPagePowerOn : AITryState
     public override void StartState()
     {
         tgpMfd.TGPPwrButton();
+        tgpCallout.SayCallout();
     }
 
     public override void UpdateState()

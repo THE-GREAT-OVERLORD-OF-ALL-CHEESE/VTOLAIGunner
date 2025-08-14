@@ -26,6 +26,9 @@
       <HintPath>D:\SteamLibrary\steamapps\common\VTOL VR\VTOLVR_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>..\..\..\..\..\VTOLVR_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>D:\SteamLibrary\steamapps\common\VTOL VR\VTOLVR_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>false</Private>
@@ -73,7 +76,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ScriptableObjects\" />
+    <ProjectReference Include="..\AIHelicopterGunnerAssets\AIHelicopterGunnerAssets.csproj" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(ProjectDir)item.json&quot; &quot;D:\SteamLibrary\steamapps\common\VTOL VR\@Mod Loader\Mods\AIHelicopterGunner\&quot; /i /y&#xA;xcopy &quot;$(TargetPath)&quot; &quot;D:\SteamLibrary\steamapps\common\VTOL VR\@Mod Loader\Mods\AIHelicopterGunner\&quot; /i /y" />

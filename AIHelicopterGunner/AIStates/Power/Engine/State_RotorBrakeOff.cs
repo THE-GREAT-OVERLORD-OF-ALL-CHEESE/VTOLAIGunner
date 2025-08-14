@@ -1,4 +1,5 @@
-﻿using CheeseMods.AIHelicopterGunner.Character;
+﻿using AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunner.Character;
 using VTOLVR.DLC.Rotorcraft;
 
 namespace CheeseMods.AIHelicopterGunner.AIStates.Power;
@@ -6,7 +7,6 @@ namespace CheeseMods.AIHelicopterGunner.AIStates.Power;
 public class State_RotorBrakeOff : AITryState
 {
     private RotorBrake rotorBrake;
-    private IVoice voice;
 
     public override string Name => "Rotor Brake Off";
 
@@ -14,10 +14,12 @@ public class State_RotorBrakeOff : AITryState
 
     public override float CoolDown => 3f;
 
+    public Callout rotorBrakeCallout;
+
     public State_RotorBrakeOff(RotorBrake rotorBrake, IVoice voice)
     {
         this.rotorBrake = rotorBrake;
-        this.voice = voice;
+        rotorBrakeCallout = new Callout(5f, 10f, 1, () => voice.Say("Rotor brake off"));
     }
 
     public override bool CanStart()
@@ -28,7 +30,6 @@ public class State_RotorBrakeOff : AITryState
     public override void StartState()
     {
         rotorBrake.SetBrake(0);
-        voice.Say("Rotor brake off");
     }
 
     public override void UpdateState()

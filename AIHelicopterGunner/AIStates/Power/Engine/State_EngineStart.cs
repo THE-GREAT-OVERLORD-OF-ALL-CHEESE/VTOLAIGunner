@@ -1,4 +1,5 @@
 ﻿using CheeseMods.AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 using System.Collections.Generic;
 using System.Linq;
 using VTOLVR.DLC.Rotorcraft;
@@ -18,13 +19,19 @@ public class State_EngineStart : AITryState
 
     private IVoice voice;
     private string engineID;
+    private LineType lineType;
 
-    public State_EngineStart(TurbineStarterMotor turbineStarter, List<TurbineStarterMotor> prerequisiteStarters, IVoice voice, string engineID)
+    public State_EngineStart(TurbineStarterMotor turbineStarter,
+        List<TurbineStarterMotor> prerequisiteStarters,
+        IVoice voice,
+        string engineID,
+        LineType lineType)
     {
         this.turbineStarter = turbineStarter;
         this.voice = voice;
         this.engineID = engineID;
         this.prerequisiteStarters = prerequisiteStarters;
+        this.lineType = lineType;
     }
 
     public override bool CanStart()
@@ -36,7 +43,7 @@ public class State_EngineStart : AITryState
     public override void StartState()
     {
         turbineStarter.SetMotorEnabled(2);
-        voice.Say($"Starting {engineID}");
+        voice.SaySystemStarting(lineType);
     }
 
     public override void UpdateState()

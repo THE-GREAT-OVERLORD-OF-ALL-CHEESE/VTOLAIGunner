@@ -1,5 +1,7 @@
-﻿using CheeseMods.AIHelicopterGunner.AIHelpers;
+﻿using AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunner.AIHelpers;
 using CheeseMods.AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 using UnityEngine;
 
 namespace CheeseMods.AIHelicopterGunner.AIStates.WM;
@@ -8,7 +10,9 @@ public class State_WMFireGunTPGLock : AITryState
 {
     private WeaponManager wm;
     private TargetingMFDPage tgpMfd;
-    private IVoice voice;
+
+    private Callout gunsCallout;
+    private Report targetDestroyed;
 
     public override string Name => "Firing Gun";
     public override float WarmUp => 0.5f;
@@ -24,7 +28,7 @@ public class State_WMFireGunTPGLock : AITryState
     {
         this.wm = wm;
         this.tgpMfd = tgpMfd;
-        this.voice = voice;
+        gunsCallout = new Callout(10f, 20f, 3, () => voice.Say(LineType.GunsGunsGuns));
     }
 
     public override bool CanStart()
@@ -53,7 +57,7 @@ public class State_WMFireGunTPGLock : AITryState
         wm.StartFire();
         burstCoolDown = RandomHelper.BellCurve(minBurstLength, maxBurstLength);
 
-        voice.Say("Guns Guns Guns");
+        gunsCallout.SayCallout();
     }
 
     public override void UpdateState()

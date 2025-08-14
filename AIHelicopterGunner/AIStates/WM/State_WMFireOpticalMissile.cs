@@ -1,5 +1,7 @@
-﻿using CheeseMods.AIHelicopterGunner.Character;
+﻿using AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunner.Character;
 using CheeseMods.AIHelicopterGunner.Components;
+using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 using System;
 using UnityEngine;
 
@@ -10,7 +12,8 @@ public class State_WMFireOpticalMissile : AITryState
     private AIGunner gunner;
     private WeaponManager wm;
     private TargetingMFDPage tgpMfd;
-    private IVoice voice;
+
+    private Callout missileCallout;
 
     public override string Name => "Firing Optical Missile";
     public override float WarmUp => 0.5f;
@@ -24,7 +27,7 @@ public class State_WMFireOpticalMissile : AITryState
         this.gunner = gunner;
         this.wm = wm;
         this.tgpMfd = tgpMfd;
-        this.voice = voice;
+        missileCallout = new Callout(5f, 10f, 2, () => voice.Say(LineType.Rifle));
     }
 
     public override bool CanStart()
@@ -58,7 +61,7 @@ public class State_WMFireOpticalMissile : AITryState
         launchedMissile = missileLauncher.ml.GetNextMissile();
         wm.StartFire();
 
-        voice.Say("Rifle, keep lock");
+        missileCallout.SayCallout();
     }
 
     public override void UpdateState()

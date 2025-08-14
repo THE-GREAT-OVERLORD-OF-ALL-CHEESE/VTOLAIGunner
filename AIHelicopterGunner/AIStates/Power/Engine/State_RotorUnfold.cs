@@ -1,4 +1,5 @@
-﻿using CheeseMods.AIHelicopterGunner.Character;
+﻿using AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunner.Character;
 using VTOLVR.DLC.Rotorcraft;
 
 namespace CheeseMods.AIHelicopterGunner.AIStates.Power;
@@ -6,7 +7,6 @@ namespace CheeseMods.AIHelicopterGunner.AIStates.Power;
 public class State_RotorUnfold : AITryState
 {
     private HelicopterRotor rotor;
-    private IVoice voice;
 
     public override string Name => "Rotor Unfold";
 
@@ -14,10 +14,12 @@ public class State_RotorUnfold : AITryState
 
     public override float CoolDown => 3f;
 
+    public Callout rotorUnfoldCallout;
+
     public State_RotorUnfold(HelicopterRotor rotor, IVoice voice)
     {
         this.rotor = rotor;
-        this.voice = voice;
+        rotorUnfoldCallout = new Callout(5f, 10f, 1, () => voice.Say("Unfolding rotor"));
     }
 
     public override bool CanStart()
@@ -28,7 +30,7 @@ public class State_RotorUnfold : AITryState
     public override void StartState()
     {
         rotor.SetFold(0);
-        voice.Say("Unfolding rotor");
+        rotorUnfoldCallout.SayCallout();
     }
 
     public override void UpdateState()

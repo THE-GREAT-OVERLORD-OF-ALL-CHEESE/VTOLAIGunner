@@ -1,4 +1,7 @@
-﻿namespace CheeseMods.AIHelicopterGunner.AIStates.Power;
+﻿using AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunner.Character;
+
+namespace CheeseMods.AIHelicopterGunner.AIStates.Power;
 
 public class State_MasterArmOn : AITryState
 {
@@ -8,9 +11,12 @@ public class State_MasterArmOn : AITryState
     public override float WarmUp => 1f;
     public override float CoolDown => 0.5f;
 
-    public State_MasterArmOn(WeaponManager wm)
+    public Callout weaponsCallout;
+
+    public State_MasterArmOn(WeaponManager wm, IVoice voice)
     {
         this.wm = wm;
+        weaponsCallout = new Callout(5f, 10f, 1, () => voice.Say("I have weapons control"));
     }
 
     public override bool CanStart()
@@ -21,6 +27,7 @@ public class State_MasterArmOn : AITryState
     public override void StartState()
     {
         wm.ToggleMasterArmed();
+        weaponsCallout.SayCallout();
     }
 
     public override void UpdateState()
