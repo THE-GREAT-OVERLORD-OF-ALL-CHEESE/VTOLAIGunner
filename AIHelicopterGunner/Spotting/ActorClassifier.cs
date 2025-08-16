@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace CheeseMods.AIHelicopterGunner.Spotting
 {
@@ -6,6 +7,7 @@ namespace CheeseMods.AIHelicopterGunner.Spotting
     {
         public static TargetTypes CalculateTargetType(Actor target, out TargetTypeSpecial special)
         {
+            Debug.Log($"Determining target type of {target.gameObject.name}");
             if (target.parentActor != null)
             {
                 target = target.parentActor;
@@ -18,7 +20,26 @@ namespace CheeseMods.AIHelicopterGunner.Spotting
             }
 
             special = TargetTypeSpecial.None;
+            if (target.GetComponentInChildren<MissileLauncher>() != null)
+            {
+                special |= TargetTypeSpecial.Missile;
+            }
+            if (target.GetComponentInChildren<Radar>() != null)
+            {
+                special |= TargetTypeSpecial.Radar;
+            }
 
+            string filteredName = target.gameObject.name.Replace("-", "").Replace("/", "").Replace("\\", "").ToLower();
+            foreach (var knownTarget in knownTargets)
+            {
+                if (filteredName.Contains(knownTarget.name))
+                {
+                    Debug.Log($"Target is a known named target {knownTarget.name} ({knownTarget.type})");
+                    return knownTarget.type;
+                }
+            }
+
+            Debug.Log($"Target is not a known named target, inferring type...");
 
             if (unitSpawn is GroundUnitSpawn groundUnitSpawn)
             {
@@ -96,5 +117,33 @@ namespace CheeseMods.AIHelicopterGunner.Spotting
             }
             return TargetTypes.Unknown;
         }
+
+        public static List<(string name, TargetTypes type)> knownTargets
+            = new List<(string name, TargetTypes type)>
+        {
+            // helicopters
+            ("ah94", TargetTypes.Helicopter),
+
+            // fixedwing
+            ("av42", TargetTypes.Attack),
+            ("fa26", TargetTypes.Fighter),
+            ("f45", TargetTypes.Fighter),
+            ("t55", TargetTypes.Fighter),
+            ("ef24", TargetTypes.Fighter),
+            // player altnames
+            ("vtol4", TargetTypes.Fighter),
+            ("sevtf", TargetTypes.Fighter),
+
+            ("asf30", TargetTypes.Fighter),
+            ("asf33", TargetTypes.Fighter),
+            ("asf58", TargetTypes.Fighter),
+            ("gav25", TargetTypes.Attack),
+
+            //popular mods
+            ("ah6", TargetTypes.Helicopter),
+            ("a10", TargetTypes.Attack),
+            ("f16", TargetTypes.Fighter),
+            ("f22", TargetTypes.Fighter),
+        };
     }
 }

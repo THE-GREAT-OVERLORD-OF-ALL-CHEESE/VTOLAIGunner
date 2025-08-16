@@ -78,6 +78,7 @@ public class AIGunner : MonoBehaviour
         State_Sequence ensurePower = new State_Sequence(
             new List<AITryState>
             {
+                new State_DoNothingCauseDead(battery),
                 new State_APUStart(apu, voice),
                 new State_MasterPowerOn(battery, voice),
                 new State_MasterArmOn(wm, voice),
