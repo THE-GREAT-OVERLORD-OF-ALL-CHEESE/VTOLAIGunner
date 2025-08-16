@@ -70,7 +70,7 @@ public class State_WMFireGuidedRocketSalvo : AITryState
 
         salvoLeft = Mathf.Clamp(Mathf.CeilToInt(tgpMfd.opticalTargeter.lockedActor.health.maxHealth / 30), 1, maxSalvoSize);
 
-        voice.Say(LineType.Rifle);
+        SharedCallouts.rifleCallout.SayCallout();
     }
 
     public override void UpdateState()

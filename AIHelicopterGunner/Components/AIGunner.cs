@@ -54,6 +54,9 @@ public class AIGunner : MonoBehaviour
     {
         Debug.Log("Setting up gunner!");
 
+        voice = new RadioCommsVoice(AssetLoader.voice);
+        SharedCallouts.Initialise(voice);
+
         battery = GetComponentInChildren<Battery>(true);
         apu = GetComponentInChildren<AuxilliaryPowerUnit>(true);
         wm = GetComponentInChildren<WeaponManager>(true);
@@ -64,13 +67,13 @@ public class AIGunner : MonoBehaviour
         rotor = GetComponentInChildren<HelicopterRotor>(true);
         rotorBrake = GetComponentInChildren<RotorBrake>(true);
         governor = GetComponentInChildren<HeliPowerGovernor>(true);
+        autoPylon = GetComponentInChildren<ArticulatingHardpoint>(true);
         ContactReporter contactReporter = gameObject.AddComponent<ContactReporter>();
         DamageReporter damageReporter = gameObject.AddComponent<DamageReporter>();
         damageReporter.voice = voice;
-        autoPylon = GetComponentInChildren<ArticulatingHardpoint>(true);
+        ReportManager reportManager = gameObject.AddComponent<ReportManager>();
 
         targetSpotter = new GunnerTargetSpotter(metaDataManager, transform, missileHelper);
-        voice = new RadioCommsVoice(AssetLoader.voice);
 
         State_Sequence ensurePower = new State_Sequence(
             new List<AITryState>
@@ -219,7 +222,7 @@ public class AIGunner : MonoBehaviour
 
                     Debug.Log($"{Main.aiGunnerName}: New strat is to engage {target.actorName}({offset.magnitude}m)(radius {target.physicalRadius}m)({angularSize} degrees ({angularSize / GunnerAIConfig.minimumTargetSizeAngular * 100f}%)) with {attackBehaviour.Name}");
                     Debug.Log($"{wm.equips.Count(e => e is HPEquipGunTurret turret)} gun turrets were available");
-                    Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsNotOpticalFaf(ml))} optical launchers were available");
+                    Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsOpticalNotFaf(ml))} optical launchers were available");
                     Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsOpticalFaf(ml))} optical faf launchers were available");
                     Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsGuidedRocketLauncher(ml))} guided rocket launchers were available");
                     Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsTow(ml))} tow were available");

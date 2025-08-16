@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace AIHelicopterGunner.Character
+namespace CheeseMods.AIHelicopterGunner.Character
 {
     public class Callout
     {
@@ -41,7 +41,7 @@ namespace AIHelicopterGunner.Character
             lastSpokenTime = Time.time;
 
             Debug.Log(bucket);
-            if (bucket > maxShortMessages)
+            if (bucket > maxShortMessages - 1f)
             {
                 return;
             }

@@ -1,5 +1,4 @@
-﻿using AIHelicopterGunner.Character;
-using CheeseMods.AIHelicopterGunner.Character;
+﻿using CheeseMods.AIHelicopterGunner.Character;
 using VTOLVR.DLC.Rotorcraft;
 
 namespace CheeseMods.AIHelicopterGunner.AIStates.Power;

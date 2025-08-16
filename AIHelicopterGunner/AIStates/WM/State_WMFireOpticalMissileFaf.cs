@@ -1,5 +1,4 @@
-﻿using AIHelicopterGunner.Character;
-using CheeseMods.AIHelicopterGunner.Character;
+﻿using CheeseMods.AIHelicopterGunner.Character;
 using CheeseMods.AIHelicopterGunner.Components;
 using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 using System;
@@ -13,20 +12,33 @@ public class State_WMFireOpticalMissileFaf : AITryState
     private WeaponManager wm;
     private TargetingMFDPage tgpMfd;
 
-    private Callout missileCallout;
+    private Report targetDestroyed;
+    private Report missileTrashed;
 
     public override string Name => "Firing Optical Missile FaF";
     public override float WarmUp => 0.5f;
     public override float CoolDown => 0.5f;
 
     private HPEquipOpticalML missileLauncher;
+    private Missile launchedMissile;
+
+    private Actor currentTarget;
 
     public State_WMFireOpticalMissileFaf(AIGunner gunner, WeaponManager wm, TargetingMFDPage tgpMfd, IVoice voice)
     {
         this.gunner = gunner;
         this.wm = wm;
         this.tgpMfd = tgpMfd;
-        missileCallout = new Callout(5f, 10f, 2, () => voice.Say(LineType.Rifle));
+
+        targetDestroyed = new Report(10f,
+            () => false,
+            () => currentTarget == null || currentTarget.alive == false,
+            () => voice.Say(LineType.Splash));
+
+        missileTrashed = new Report(10f,
+            () => currentTarget == null || currentTarget.alive == false,
+            () => launchedMissile == null,
+            () => voice.Say(LineType.Trashed));
     }
 
     public override bool CanStart()
@@ -55,10 +67,14 @@ public class State_WMFireOpticalMissileFaf : AITryState
 
     public override void StartState()
     {
+        currentTarget = tgpMfd.opticalTargeter.lockedActor;
+        launchedMissile = missileLauncher.ml.GetNextMissile();
         gunner.missileHelper.ReportMissilePerTarget(tgpMfd.opticalTargeter.lockedActor, missileLauncher.ml.GetNextMissile());
         wm.StartFire();
 
-        missileCallout.SayCallout();
+        SharedCallouts.rifleCallout.SayCallout();
+        targetDestroyed.StartReport();
+        missileTrashed.StartReport();
     }
 
     public override void UpdateState()

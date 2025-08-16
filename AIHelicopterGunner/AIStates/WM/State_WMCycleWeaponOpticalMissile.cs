@@ -16,6 +16,6 @@ public class State_WMCycleWeaponOpticalMissile : State_WMCycleWeapon
         HPEquippable equip = wm.currentEquip;
         return equip.GetCount() <= 0
             || equip is not HPEquipOpticalML opticalML
-            || !MissileHelper.IsNotOpticalFaf(opticalML);
+            || !MissileHelper.IsOpticalNotFaf(opticalML);
     }
 }

@@ -1,5 +1,4 @@
-﻿using AIHelicopterGunner.Character;
-using CheeseMods.AIHelicopterGunner.Character;
+﻿using CheeseMods.AIHelicopterGunner.Character;
 using System;
 
 namespace CheeseMods.AIHelicopterGunner.AIStates.TGP;

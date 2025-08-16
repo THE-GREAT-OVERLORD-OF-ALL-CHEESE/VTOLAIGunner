@@ -1,5 +1,4 @@
-﻿using AIHelicopterGunner.Character;
-using CheeseMods.AIHelicopterGunner.Character;
+﻿using CheeseMods.AIHelicopterGunner.Character;
 using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 
 namespace CheeseMods.AIHelicopterGunner.AIStates.Power;

@@ -23,7 +23,7 @@ public class AttackBehaviour_OpticalMissile : AttackBehaviour_ATGM
     public override bool HaveAmmo()
     {
         return WeaponManager.equips.Any(e => e is HPEquipOpticalML ml
-        && MissileHelper.IsNotOpticalFaf(ml)
+        && MissileHelper.IsOpticalNotFaf(ml)
         && ml.armed
         && ml.GetCount() > 0);
     }

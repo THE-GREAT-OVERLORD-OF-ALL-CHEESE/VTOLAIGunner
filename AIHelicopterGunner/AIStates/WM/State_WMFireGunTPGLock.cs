@@ -1,5 +1,4 @@
-﻿using AIHelicopterGunner.Character;
-using CheeseMods.AIHelicopterGunner.AIHelpers;
+﻿using CheeseMods.AIHelicopterGunner.AIHelpers;
 using CheeseMods.AIHelicopterGunner.Character;
 using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 using UnityEngine;
@@ -11,7 +10,6 @@ public class State_WMFireGunTPGLock : AITryState
     private WeaponManager wm;
     private TargetingMFDPage tgpMfd;
 
-    private Callout gunsCallout;
     private Report targetDestroyed;
 
     public override string Name => "Firing Gun";
@@ -24,11 +22,17 @@ public class State_WMFireGunTPGLock : AITryState
     private const float minBurstLength = 1.5f;
     private float burstCoolDown;
 
+    private Actor currentTarget;
+
     public State_WMFireGunTPGLock(WeaponManager wm, TargetingMFDPage tgpMfd, IVoice voice)
     {
         this.wm = wm;
         this.tgpMfd = tgpMfd;
-        gunsCallout = new Callout(10f, 20f, 3, () => voice.Say(LineType.GunsGunsGuns));
+
+        targetDestroyed = new Report(3f,
+            () => false,
+            () => currentTarget == null || currentTarget.alive == false,
+            () => voice.Say(LineType.Splash));
     }
 
     public override bool CanStart()
@@ -57,7 +61,10 @@ public class State_WMFireGunTPGLock : AITryState
         wm.StartFire();
         burstCoolDown = RandomHelper.BellCurve(minBurstLength, maxBurstLength);
 
-        gunsCallout.SayCallout();
+        SharedCallouts.gunsCallout.SayCallout();
+
+        currentTarget = tgpMfd.opticalTargeter.lockedActor;
+        targetDestroyed.StartReport();
     }
 
     public override void UpdateState()

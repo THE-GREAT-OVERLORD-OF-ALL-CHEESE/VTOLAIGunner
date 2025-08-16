@@ -71,7 +71,7 @@ public class MissileHelper
         return 0;
     }
 
-    public static bool IsNotOpticalFaf(HPEquipOpticalML ml)
+    public static bool IsOpticalNotFaf(HPEquipOpticalML ml)
     {
         return ml.ml.GetNextMissile() != null
             && ml.ml.GetNextMissile()?.opticalFAF == false

@@ -1,6 +1,7 @@
-﻿namespace AIHelicopterGunner.Character
+﻿namespace CheeseMods.AIHelicopterGunner.Character
 {
-    internal class Prompt
+    public class Prompt
     {
+
     }
 }
