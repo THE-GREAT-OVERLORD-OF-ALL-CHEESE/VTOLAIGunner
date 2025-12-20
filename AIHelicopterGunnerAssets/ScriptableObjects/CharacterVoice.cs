@@ -13,7 +13,14 @@ namespace CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects
 
         public AudioClip GetClip(LineType lineType)
         {
-            return voiceLines.FirstOrDefault(l => l.lineType == lineType).audioClips.FirstOrDefault();
+            CharacterVoiceLine line = voiceLines.FirstOrDefault(l => l.lineType == lineType);
+
+            if (line == null || line.audioClips.Count == 0)
+            {
+                Debug.LogError($"Error: missing lines for line type: {lineType}");
+            }
+
+            return line.audioClips[Random.Range(0, line.audioClips.Count)];
         }
     }
 }

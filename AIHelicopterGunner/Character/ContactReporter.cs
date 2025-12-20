@@ -47,9 +47,16 @@ namespace AIHelicopterGunner.Character
                     waitForMoreContactsTimer = 0;
 
                     TargetMetaData currentContact = unreportedContacts.First();
-                    voice.SayReportContact(currentContact);
-                    unreportedContacts.Remove(currentContact);
-                    reportedContacts.Add(currentContact);
+
+                    List<TargetMetaData> groupToReport = new List<TargetMetaData>();
+                    groupToReport = unreportedContacts.Where(c => c.TargetType == currentContact.TargetType).ToList();
+                    voice.SayReportContact(currentContact, groupToReport.Count());
+
+                    foreach (TargetMetaData reported in groupToReport)
+                    {
+                        unreportedContacts.Remove(reported);
+                        reportedContacts.Add(reported);
+                    }
                 }
             }
         }

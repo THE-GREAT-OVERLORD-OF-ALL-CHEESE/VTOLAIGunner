@@ -2,8 +2,6 @@
 {
     public enum LineType
     {
-        //PlaceHolder,
-
         // Misc
         Roger,
         GoodJob,
@@ -32,7 +30,7 @@
         Trashed,
 
         //Control
-        //IHaveTGP,
+        IHaveTGP,
         IHaveWeapons,
 
         //Command
@@ -51,6 +49,14 @@
         Contact,
         WithRadarMissiles,
         WithMissiles,
+
+        // Count
+        Count1,
+        Count2,
+        Count3,
+        Count4,
+        Count5,
+        CountMany,
 
         // Clock
         Clock1,

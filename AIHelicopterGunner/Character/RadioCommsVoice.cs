@@ -1,6 +1,7 @@
 ﻿using CheeseMods.AIHelicopterGunner.AIHelpers;
 using CheeseMods.AIHelicopterGunner.Spotting;
 using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CheeseMods.AIHelicopterGunner.Character
@@ -51,43 +52,33 @@ namespace CheeseMods.AIHelicopterGunner.Character
                 false);
         }
 
-        public void SayReportContact(TargetMetaData targetMetaData)
+        public void SayReportContact(TargetMetaData targetMetaData, int count)
         {
-            LineType? special = null;
+            List<AudioClip> clips = new List<AudioClip>();
+
+            clips.Add(voice.GetClip(LineType.Contact));
+
+            if (count > 0)
+            {
+                clips.Add(voice.GetClip(LineTypeHelper.CountToLineType(count)));
+            }
+
+            clips.Add(voice.GetClip(LineTypeHelper.TargetTypeToLineType(targetMetaData.TargetType)));
+
             if (targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Radar)
                 && targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Missile))
             {
-                special = LineType.WithRadarMissiles;
+                clips.Add(voice.GetClip(LineType.WithRadarMissiles));
             }
             else if (targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Missile))
             {
-                special = LineType.WithMissiles;
+                clips.Add(voice.GetClip(LineType.WithMissiles));
             }
 
-            if (special != null)
-            {
-                CommRadioManager.instance.PlayMessageString(
-                    new AudioClip[]
-                    {
-                        voice.GetClip(LineType.Contact),
-                        voice.GetClip(TargetHelper.TargetTypeToLineType(targetMetaData.TargetType)),
-                        voice.GetClip(special ?? LineType.Unknown),
-                    },
+            CommRadioManager.instance.PlayMessageString(
+                    clips.ToArray(),
                     true,
                     false);
-            }
-            else
-            {
-                CommRadioManager.instance.PlayMessageString(
-                    new AudioClip[]
-                    {
-                        voice.GetClip(LineType.Contact),
-                        voice.GetClip(TargetHelper.TargetTypeToLineType(targetMetaData.TargetType)),
-                    },
-                    true,
-                    false);
-
-            }
         }
     }
 }

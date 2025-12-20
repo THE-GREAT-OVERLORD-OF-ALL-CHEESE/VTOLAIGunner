@@ -33,7 +33,11 @@ namespace CheeseMods.AIHelicopterGunner.Character
 
         public void SayReportContact(TargetMetaData targetMetaData)
         {
-            SayText($"Contact {targetMetaData.TargetType}");
+        }
+
+        public void SayReportContact(TargetMetaData targetMetaData, int ammount)
+        {
+            SayText($"Contact {targetMetaData.TargetType} x{ammount}");
         }
     }
 }

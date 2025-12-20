@@ -3,8 +3,28 @@ using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 
 namespace CheeseMods.AIHelicopterGunner.AIHelpers
 {
-    public static class TargetHelper
+    public static class LineTypeHelper
     {
+        public static LineType CountToLineType(int count)
+        {
+            switch (count)
+            {
+                case 0:
+                    break;
+                case 1:
+                    return LineType.Count1;
+                case 2:
+                    return LineType.Count2;
+                case 3:
+                    return LineType.Count3;
+                case 4:
+                    return LineType.Count4;
+                case 5:
+                    return LineType.Count5;
+            }
+            return LineType.CountMany;
+        }
+
         public static LineType TargetTypeToLineType(TargetTypes type)
         {
             switch (type)
