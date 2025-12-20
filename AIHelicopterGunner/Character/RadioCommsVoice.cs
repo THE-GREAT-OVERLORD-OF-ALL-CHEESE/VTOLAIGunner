@@ -1,4 +1,5 @@
-﻿using CheeseMods.AIHelicopterGunner.Spotting;
+﻿using CheeseMods.AIHelicopterGunner.AIHelpers;
+using CheeseMods.AIHelicopterGunner.Spotting;
 using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 using UnityEngine;
 
@@ -52,17 +53,41 @@ namespace CheeseMods.AIHelicopterGunner.Character
 
         public void SayReportContact(TargetMetaData targetMetaData)
         {
-            string thingToSay = $"Contact {targetMetaData.TargetType}";
+            LineType? special = null;
             if (targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Radar)
                 && targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Missile))
             {
-                thingToSay += $" with radar missiles";
+                special = LineType.WithRadarMissiles;
             }
             else if (targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Missile))
             {
-                thingToSay += $" with missiles";
+                special = LineType.WithMissiles;
             }
-            Say(thingToSay);
+
+            if (special != null)
+            {
+                CommRadioManager.instance.PlayMessageString(
+                    new AudioClip[]
+                    {
+                        voice.GetClip(LineType.Contact),
+                        voice.GetClip(TargetHelper.TargetTypeToLineType(targetMetaData.TargetType)),
+                        voice.GetClip(special ?? LineType.Unknown),
+                    },
+                    true,
+                    false);
+            }
+            else
+            {
+                CommRadioManager.instance.PlayMessageString(
+                    new AudioClip[]
+                    {
+                        voice.GetClip(LineType.Contact),
+                        voice.GetClip(TargetHelper.TargetTypeToLineType(targetMetaData.TargetType)),
+                    },
+                    true,
+                    false);
+
+            }
         }
     }
 }
