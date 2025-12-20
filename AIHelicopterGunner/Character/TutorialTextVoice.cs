@@ -1,4 +1,5 @@
-﻿using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
+﻿using CheeseMods.AIHelicopterGunner.Spotting;
+using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 
 namespace CheeseMods.AIHelicopterGunner.Character
 {
@@ -28,6 +29,11 @@ namespace CheeseMods.AIHelicopterGunner.Character
         public void SaySystemDestroyed(LineType type)
         {
             SayText($"Destroyed {type}");
+        }
+
+        public void SayReportContact(TargetMetaData targetMetaData)
+        {
+            SayText($"Contact {targetMetaData.TargetType}");
         }
     }
 }

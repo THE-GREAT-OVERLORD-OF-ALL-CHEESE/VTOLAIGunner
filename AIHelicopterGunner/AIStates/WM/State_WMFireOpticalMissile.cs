@@ -30,13 +30,13 @@ public class State_WMFireOpticalMissile : AITryState
         this.wm = wm;
         this.tgpMfd = tgpMfd;
 
-        targetDestroyed = new Report(10f,
-            () => false,
+        targetDestroyed = new Report(60f,
+            () => !(currentTarget == null || currentTarget.alive == false) && (launchedMissile == null || !launchedMissile.fired),
             () => currentTarget == null || currentTarget.alive == false,
             () => voice.Say(LineType.Splash));
 
-        missileTrashed = new Report(10f,
-            () => currentTarget == null || currentTarget.alive == false,
+        missileTrashed = new Report(60f,
+            () => currentTarget == null || currentTarget.alive == false || !launchedMissile.fired,
             () => launchedMissile == null,
             () => voice.Say(LineType.Trashed));
     }

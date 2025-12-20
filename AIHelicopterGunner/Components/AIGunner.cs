@@ -1,4 +1,5 @@
-﻿using CheeseMods.AIHelicopterGunner.AIHelpers;
+﻿using AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunner.AIHelpers;
 using CheeseMods.AIHelicopterGunner.AIStates;
 using CheeseMods.AIHelicopterGunner.AIStates.Equip;
 using CheeseMods.AIHelicopterGunner.AIStates.MFDStates;
@@ -41,6 +42,7 @@ public class AIGunner : MonoBehaviour
 
     public TargetMetaDataManager metaDataManager = new TargetMetaDataManager();
     public GunnerTargetSpotter targetSpotter;
+    public ContactReporter contactReporter;
     public Actor target;
     public MissileHelper missileHelper = new MissileHelper();
     public List<AttackBehaviour> attackBehaviours = new List<AttackBehaviour>();
@@ -68,12 +70,12 @@ public class AIGunner : MonoBehaviour
         rotorBrake = GetComponentInChildren<RotorBrake>(true);
         governor = GetComponentInChildren<HeliPowerGovernor>(true);
         autoPylon = GetComponentInChildren<ArticulatingHardpoint>(true);
-        ContactReporter contactReporter = gameObject.AddComponent<ContactReporter>();
         DamageReporter damageReporter = gameObject.AddComponent<DamageReporter>();
         damageReporter.voice = voice;
         ReportManager reportManager = gameObject.AddComponent<ReportManager>();
 
         targetSpotter = new GunnerTargetSpotter(metaDataManager, transform, missileHelper);
+        contactReporter = new ContactReporter(targetSpotter, voice);
 
         State_Sequence ensurePower = new State_Sequence(
             new List<AITryState>
@@ -81,14 +83,19 @@ public class AIGunner : MonoBehaviour
                 new State_DoNothingCauseDead(battery),
                 new State_APUStart(apu, voice),
                 new State_MasterPowerOn(battery, voice),
-                new State_MasterArmOn(wm, voice),
 
-                new State_EngineThrottleIdle(governor, voice),
-                new State_EngineStart(starterMotors[0], new List<TurbineStarterMotor>(), voice, "Engine 1", LineType.Engine1),
-                new State_EngineStart(starterMotors[1], new List<TurbineStarterMotor>(){ starterMotors[0] }, voice, "Engine 2", LineType.Engine2),
-                new State_RotorUnfold(rotor, voice),
-                new State_RotorBrakeOff(rotorBrake, voice),
-                new State_EngineThrottleFull(governor, voice),
+                new State_ConditionalSequence(() => !flightInfo.isLanded || Input.GetKey(KeyCode.Space), new List<AITryState>()
+                {
+                    new State_EngineThrottleIdle(governor, voice),
+                    new State_EngineStart(starterMotors[0], new List<TurbineStarterMotor>(), voice, "Engine 1", LineType.Engine1),
+                    new State_EngineStart(starterMotors[1], new List<TurbineStarterMotor>(){ starterMotors[0] }, voice, "Engine 2", LineType.Engine2),
+                    new State_RotorUnfold(rotor, voice),
+                    new State_RotorBrakeOff(rotorBrake, voice),
+                    new State_EngineThrottleFull(governor, voice),
+                },
+                "Ensure engine on",
+                0f,
+                0f)
             },
             "Ensure Power",
             1f,
@@ -116,6 +123,7 @@ public class AIGunner : MonoBehaviour
             {
                 ensurePower,
                 tgpSlewToTarget,
+                new State_MasterArmOn(wm, voice),
                 new State_WMCycleWeapon(wm, typeof(HPEquipGunTurret)),
                 new State_WMFireGunTPGLock(wm, tgpMfd, voice),
                 tgpSlewToTarget
@@ -130,6 +138,7 @@ public class AIGunner : MonoBehaviour
             {
                 ensurePower,
                 tgpSlewToTarget,
+                new State_MasterArmOn(wm, voice),
                 new State_WMCycleWeaponOpticalMissile(wm),
                 new State_EquipSwitchOpticalMissleAutoUncage(wm, tgpMfd),
                 new State_PylonAuto(autoPylon),
@@ -145,6 +154,7 @@ public class AIGunner : MonoBehaviour
             {
                 ensurePower,
                 tgpSlewToTarget,
+                new State_MasterArmOn(wm, voice),
                 new State_WMCycleWeaponOpticalMissileFaf(wm),
                 new State_EquipSwitchOpticalMissleAutoUncage(wm, tgpMfd),
                 new State_PylonAuto(autoPylon),
@@ -160,6 +170,7 @@ public class AIGunner : MonoBehaviour
             {
                 ensurePower,
                 tgpSlewToTarget,
+                new State_MasterArmOn(wm, voice),
                 new State_WMCycleWeaponGuidedRocket(wm),
                 new State_EquipSwitchOpticalMissleAutoUncage(wm, tgpMfd),
                 new State_PylonAuto(autoPylon),
@@ -175,6 +186,7 @@ public class AIGunner : MonoBehaviour
             {
                 ensurePower,
                 tgpSlewToTarget,
+                new State_MasterArmOn(wm, voice),
                 new State_WMCycleWeaponTOW(wm),
                 new State_EquipSwitchOpticalMissleAutoUncage(wm, tgpMfd),
                 new State_PylonAuto(autoPylon),
@@ -201,6 +213,7 @@ public class AIGunner : MonoBehaviour
     {
         targetSpotter.UpdateVisibleTargets();
         missileHelper.UpdateMissilePerTarget();
+        contactReporter.UpdateContactReporting();
 
         if (sequence.Idle)
         {

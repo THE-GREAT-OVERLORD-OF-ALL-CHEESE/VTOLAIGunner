@@ -1,4 +1,5 @@
-﻿using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
+﻿using CheeseMods.AIHelicopterGunner.Spotting;
+using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 using UnityEngine;
 
 namespace CheeseMods.AIHelicopterGunner.Character
@@ -47,6 +48,21 @@ namespace CheeseMods.AIHelicopterGunner.Character
                 },
                 true,
                 false);
+        }
+
+        public void SayReportContact(TargetMetaData targetMetaData)
+        {
+            string thingToSay = $"Contact {targetMetaData.TargetType}";
+            if (targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Radar)
+                && targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Missile))
+            {
+                thingToSay += $" with radar missiles";
+            }
+            else if (targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Missile))
+            {
+                thingToSay += $" with missiles";
+            }
+            Say(thingToSay);
         }
     }
 }

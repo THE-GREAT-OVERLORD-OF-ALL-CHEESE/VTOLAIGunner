@@ -53,6 +53,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptableObjects\CharacterVoice.cs" />
     <Compile Include="ScriptableObjects\CharacterVoiceLine.cs" />
+    <Compile Include="ScriptableObjects\LineType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -60,6 +61,7 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)" "D:\SteamLibrary\steamapps\common\VTOL VR\@Mod Loader\Mods\AIHelicopterGunner\" /i /y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetPath)" "D:\SteamLibrary\steamapps\common\VTOL VR\@Mod Loader\Mods\AIHelicopterGunner\" /i /y
+xcopy "$(TargetPath)" "D:\Unity\VTOL Modding Assets\Assets\Mods\Dll\" /i /y</PostBuildEvent>
   </PropertyGroup>
 </Project>

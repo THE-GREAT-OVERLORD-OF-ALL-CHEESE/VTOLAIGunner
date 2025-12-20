@@ -14,6 +14,8 @@ public class State_WMFireGuidedRocketSalvo : AITryState
     private TargetingMFDPage tgpMfd;
     private IVoice voice;
 
+    private Report targetDestroyed;
+
     public override string Name => "Firing Guided Rocket Salvo";
     public override float WarmUp => 0.5f;
     public override float CoolDown => 0.5f;
@@ -26,6 +28,8 @@ public class State_WMFireGuidedRocketSalvo : AITryState
     private float shotCoolDownTimer;
 
     private List<Missile> missiles = new List<Missile>();
+
+    private Actor currentTarget;
 
     public State_WMFireGuidedRocketSalvo(AIGunner gunner, WeaponManager wm, TargetingMFDPage tgpMfd, IVoice voice)
     {
@@ -71,6 +75,10 @@ public class State_WMFireGuidedRocketSalvo : AITryState
         salvoLeft = Mathf.Clamp(Mathf.CeilToInt(tgpMfd.opticalTargeter.lockedActor.health.maxHealth / 30), 1, maxSalvoSize);
 
         SharedCallouts.rifleCallout.SayCallout();
+        targetDestroyed = new Report(60f,
+            () => !(currentTarget == null || currentTarget.alive == false) && !missiles.All(m => m == null || !m.fired),
+            () => currentTarget == null || currentTarget.alive == false,
+            () => voice.Say(LineType.Splash));
     }
 
     public override void UpdateState()
