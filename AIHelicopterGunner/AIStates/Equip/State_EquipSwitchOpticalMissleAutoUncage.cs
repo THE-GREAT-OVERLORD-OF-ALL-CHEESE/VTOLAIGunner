@@ -8,7 +8,7 @@ public class State_EquipSwitchOpticalMissleAutoUncage : AITryState
     private TargetingMFDPage tgpMfd;
 
     public override string Name => "Switch Optical Missile to Auto Uncage";
-    public override float WarmUp => 2f;
+    public override float WarmUp => 1f;
     public override float CoolDown => 0.5f;
 
     private HPEquipOpticalML missileLauncher;

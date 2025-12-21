@@ -34,6 +34,7 @@ public class AIGunner : MonoBehaviour
 
     private State_Sequence sequence;
 
+    private State_Sequence nonCombatSequence;
     private State_Sequence cannonSequence;
     private State_Sequence opticalMissile;
     private State_Sequence opticalMissileFaf;
@@ -119,6 +120,16 @@ public class AIGunner : MonoBehaviour
             0f
         );
 
+        nonCombatSequence = new State_Sequence(
+            new List<AITryState>
+            {
+                ensurePower
+            },
+            "Engage with Cannon",
+            0f,
+            0f
+        );
+
         cannonSequence = new State_Sequence(
             new List<AITryState>
             {
@@ -129,7 +140,7 @@ public class AIGunner : MonoBehaviour
                 new State_WMFireGunTPGLock(wm, tgpMfd, voice),
                 tgpSlewToTarget
             },
-            "Engage with Cannon",
+            "Noncombat",
             0f,
             0f
         );
@@ -262,6 +273,10 @@ public class AIGunner : MonoBehaviour
                     }
                 }
                 */
+            }
+            else
+            {
+                sequence = nonCombatSequence;
             }
         }
 
