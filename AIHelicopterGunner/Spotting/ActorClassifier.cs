@@ -41,6 +41,15 @@ namespace CheeseMods.AIHelicopterGunner.Spotting
 
             Debug.Log($"Target is not a known named target, inferring type...");
 
+            TargetTypes inferedType = InferTargetType(target, ref special, unitSpawn);
+
+            Debug.Log($"Infered that this unit is a {inferedType} from its attributes");
+
+            return inferedType;
+        }
+
+        private static TargetTypes InferTargetType(Actor target, ref TargetTypeSpecial special, UnitSpawn unitSpawn)
+        {
             if (unitSpawn is GroundUnitSpawn groundUnitSpawn)
             {
                 if (groundUnitSpawn is AIJTACSpawn jtacSpawn)
@@ -82,6 +91,11 @@ namespace CheeseMods.AIHelicopterGunner.Spotting
                     special |= TargetTypeSpecial.Missile;
                     return TargetTypes.SamLauncher;
                 }
+                // last resort
+                if (groundUnitSpawn.health.minDamage > 0)
+                {
+                    return TargetTypes.Armoured;
+                }
                 return TargetTypes.Vehicle;
             }
             if (unitSpawn is AISeaUnitSpawn seaUnitSpawn)
@@ -89,6 +103,19 @@ namespace CheeseMods.AIHelicopterGunner.Spotting
                 if (seaUnitSpawn is AICarrierSpawn)
                 {
                     return TargetTypes.Carrier;
+                }
+                if (seaUnitSpawn is AIDroneCarrierSpawn)
+                {
+                    return TargetTypes.Carrier;
+                }
+                // last resort
+                if (seaUnitSpawn.GetComponentInChildren<SAMLauncher>() != null)
+                {
+                    return TargetTypes.Cruiser;
+                }
+                if (seaUnitSpawn.GetComponentInChildren<GunTurretAI>() != null)
+                {
+                    return TargetTypes.GunBoat;
                 }
                 return TargetTypes.Boat;
             }
@@ -110,6 +137,7 @@ namespace CheeseMods.AIHelicopterGunner.Spotting
                         return TargetTypes.Bomber;
                 }
             }
+            // hopefully we were able to guess the player aircraft from name, if not, assume a fighter
             if (unitSpawn is MultiplayerSpawn playerSpawn)
             {
                 special |= TargetTypeSpecial.Radar & TargetTypeSpecial.Missile;

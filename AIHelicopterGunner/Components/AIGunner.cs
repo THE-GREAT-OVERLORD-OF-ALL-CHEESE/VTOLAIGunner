@@ -94,8 +94,8 @@ public class AIGunner : MonoBehaviour
                     new State_EngineThrottleFull(governor, voice),
                 },
                 "Ensure engine on",
-                0f,
-                0f)
+                0.5f,
+                0.5f)
             },
             "Ensure Power",
             1f,
@@ -105,6 +105,7 @@ public class AIGunner : MonoBehaviour
         State_Sequence tgpSlewToTarget = new State_Sequence(
             new List<AITryState>
             {
+                ensurePower,
                 new State_MFDSwitchOn(mfd),
                 new State_MFDSwitchTPGPage(mfd, tgpMfd),
                 new State_TGPPagePowerOn(tgpMfd, voice),
@@ -224,6 +225,7 @@ public class AIGunner : MonoBehaviour
             {
                 sequence = attackBehaviour.Sequence;
 
+                /*
                 if (target != lastTarget || attackBehaviour != lastAttackBehviour)
                 {
                     lastTarget = target;
@@ -234,7 +236,6 @@ public class AIGunner : MonoBehaviour
 
                     voice.Say($"{Main.aiGunnerName}: Targeting: {target.actorName}({offset.magnitude}m)(radius {target.physicalRadius}m)({angularSize} degrees ({angularSize / GunnerAIConfig.minimumTargetSizeAngular * 100f}%)) with {attackBehaviour.Name}");
 
-                    /*
                     Debug.Log($"{Main.aiGunnerName}: New strat is to engage {target.actorName}({offset.magnitude}m)(radius {target.physicalRadius}m)({angularSize} degrees ({angularSize / GunnerAIConfig.minimumTargetSizeAngular * 100f}%)) with {attackBehaviour.Name}");
                     Debug.Log($"{wm.equips.Count(e => e is HPEquipGunTurret turret)} gun turrets were available");
                     Debug.Log($"{wm.equips.Count(e => e is HPEquipOpticalML ml && MissileHelper.IsOpticalNotFaf(ml))} optical launchers were available");
@@ -259,8 +260,8 @@ public class AIGunner : MonoBehaviour
                         Debug.Log($"Target {targetMetaData.Actor.actorName}:");
                         Debug.Log($"Can Attack: {targetMetaData.CanAttack}, Hostile: {targetMetaData.Hostile}, Has Radar: {targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Radar)}, In Range: {InRange(targetMetaData.Actor.position, 0f, targetMetaData.MaxRange)}, Has Missile: {targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Missile)}, Max Range: {targetMetaData.MaxRange}, Range {Range(targetMetaData.Actor.position)}, Value: {targetMetaData.Value}");
                     }
-                    */
                 }
+                */
             }
         }
 
