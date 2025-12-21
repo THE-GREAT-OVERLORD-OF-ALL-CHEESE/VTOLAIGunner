@@ -29,7 +29,7 @@ namespace CheeseMods.AIHelicopterGunner.Character
 
         public void Say(List<LineType> lines)
         {
-            Debug.Log($"{ Main.aiGunnerName}: {string.Concat(lines)}");
+            Debug.Log($"{ Main.aiGunnerName}: {string.Join(" ", lines)}");
             CommRadioManager.instance.PlayMessageString(
                 lines.Select(l => voice.GetClip(l)).ToArray(),
                 true,

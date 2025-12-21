@@ -17,7 +17,8 @@ public class AttackBehaviour_OpticalMissileFaf : AttackBehaviour_ATGM
     public override bool CanAttackImmediately(TargetMetaData target)
     {
         return Gunner.InHFov(target.Actor.position, AIGunnerConsts.omImmediateFov)
-            && Gunner.InRange(target.Actor.position, AIGunnerConsts.omMinRange, AIGunnerConsts.omMaxRange);
+            && Gunner.InRange(target.Actor.position, AIGunnerConsts.omMinRange, AIGunnerConsts.omMaxRange)
+            && Gunner.missileHelper.GetMissilesForTarget(target.Actor) == 0;
     }
 
     public override bool HaveAmmo()

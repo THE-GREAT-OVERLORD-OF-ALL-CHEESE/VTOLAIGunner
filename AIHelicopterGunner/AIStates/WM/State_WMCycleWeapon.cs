@@ -20,7 +20,7 @@ public class State_WMCycleWeapon : AITryState
     public override bool CanStart()
     {
         HPEquippable equip = wm.GetEquip(wm.weaponIdx);
-        return equip.GetType() != weaponType || equip.GetCount() <= 0;
+        return equip != null && (equip.GetType() != weaponType || equip.GetCount() <= 0);
     }
 
     public override void StartState()

@@ -1,4 +1,5 @@
-﻿using CheeseMods.AIHelicopterGunner.Character;
+﻿using CheeseMods.AIHelicopterGunner;
+using CheeseMods.AIHelicopterGunner.Character;
 using CheeseMods.AIHelicopterGunner.Spotting;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,12 @@ namespace AIHelicopterGunner.Character
 
         public void UpdateContactReporting()
         {
+            UpdateUnreportedContacts();
+            ReportUnreportedContacts();
+        }
+
+        private void UpdateUnreportedContacts()
+        {
             List<TargetMetaData> currentVisibleTarget = spotter.visibleTargets.ToList();
 
             for (int i = 0; i < currentVisibleTarget.Count; i++)
@@ -42,12 +49,19 @@ namespace AIHelicopterGunner.Character
                 }
             }
 
+            if (currentVisibleTarget.Count() > 0)
+            {
+                waitForMoreContactsTimer = 0;
+            }
             unreportedContacts.AddRange(currentVisibleTarget);
+        }
 
+        private void ReportUnreportedContacts()
+        {
             if (unreportedContacts.Count > 0)
             {
                 waitForMoreContactsTimer += Time.deltaTime;
-                if (waitForMoreContactsTimer > contactReportDelay && Time.time + reportCooldown > lastReportedTime)
+                if (waitForMoreContactsTimer > contactReportDelay && Time.time > lastReportedTime + reportCooldown)
                 {
                     waitForMoreContactsTimer = 0;
                     lastReportedTime = Time.time;
@@ -65,10 +79,12 @@ namespace AIHelicopterGunner.Character
                     averagePos /= (float)groupToReport.Count;
 
                     Vector3 offset = averagePos - refTf.position;
+                    offset.y = 0;
                     float bearing = Vector3.SignedAngle(Vector3.ProjectOnPlane(refTf.forward, Vector3.up),
                         Vector3.ProjectOnPlane(offset, Vector3.up),
                         Vector3.up);
 
+                    Debug.Log($"{Main.aiGunnerName}: Reporting: {string.Join(", ", groupToReport.Select(m => m.Actor.actorName))}");
                     voice.SayReportContact(currentContact, groupToReport.Count(), bearing, offset.magnitude);
 
                     foreach (TargetMetaData reported in groupToReport)
