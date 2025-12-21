@@ -1,7 +1,9 @@
 ﻿using CheeseMods.AIHelicopterGunner.AIHelpers;
 using CheeseMods.AIHelicopterGunner.Spotting;
 using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace CheeseMods.AIHelicopterGunner.Character
@@ -22,63 +24,67 @@ namespace CheeseMods.AIHelicopterGunner.Character
 
         public void Say(LineType type)
         {
-            CommRadioManager.instance.PlayMessage(
-                voice.GetClip(type),
+            Say(new List<LineType>() { type });
+        }
+
+        public void Say(List<LineType> lines)
+        {
+            Debug.Log($"{ Main.aiGunnerName}: {string.Concat(lines)}");
+            CommRadioManager.instance.PlayMessageString(
+                lines.Select(l => voice.GetClip(l)).ToArray(),
                 true,
                 false);
         }
 
         public void SaySystemStarting(LineType type)
         {
-            CommRadioManager.instance.PlayMessageString(
-                new AudioClip[]
+            Say(
+                new List<LineType>
                 {
-                    voice.GetClip(LineType.Starting),
-                    voice.GetClip(type)
-                },
-                true,
-                false);
+                    LineType.Starting,
+                    type 
+                }
+            );
         }
 
         public void SaySystemDestroyed(LineType type)
         {
-            CommRadioManager.instance.PlayMessageString(
-                new AudioClip[]
+            Say(
+                new List<LineType>
                 {
-                    voice.GetClip(type),
-                    voice.GetClip(LineType.Destroyed)
-                },
-                true,
-                false);
+                    type,
+                    LineType.Destroyed
+                }
+            );
         }
 
-        public void SayReportContact(TargetMetaData targetMetaData, int count)
+        public void SayReportContact(TargetMetaData targetMetaData, int count, float bearing, float range)
         {
-            List<AudioClip> clips = new List<AudioClip>();
+            List<LineType> lines = new List<LineType>();
 
-            clips.Add(voice.GetClip(LineType.Contact));
+            lines.Add(LineType.Contact);
 
             if (count > 0)
             {
-                clips.Add(voice.GetClip(LineTypeHelper.CountToLineType(count)));
+                lines.Add(LineTypeHelper.CountToLineType(count));
             }
 
-            clips.Add(voice.GetClip(LineTypeHelper.TargetTypeToLineType(targetMetaData.TargetType)));
+            lines.Add(LineTypeHelper.TargetTypeToLineType(targetMetaData.TargetType));
 
             if (targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Radar)
                 && targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Missile))
             {
-                clips.Add(voice.GetClip(LineType.WithRadarMissiles));
+                lines.Add(LineType.WithRadarMissiles);
             }
             else if (targetMetaData.SpecialFlags.HasFlag(TargetTypeSpecial.Missile))
             {
-                clips.Add(voice.GetClip(LineType.WithMissiles));
+                lines.Add(LineType.WithMissiles);
             }
 
-            CommRadioManager.instance.PlayMessageString(
-                    clips.ToArray(),
-                    true,
-                    false);
+            lines.Add(LineTypeHelper.BearingToLineType(bearing));
+            lines.Add(LineTypeHelper.RangeToLineType(range));
+
+            Say(lines);
         }
     }
 }

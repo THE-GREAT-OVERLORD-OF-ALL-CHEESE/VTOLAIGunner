@@ -9,6 +9,6 @@ namespace CheeseMods.AIHelicopterGunner.Character
         public void Say(LineType type);
         public void SaySystemStarting(LineType type);
         public void SaySystemDestroyed(LineType type);
-        public void SayReportContact(TargetMetaData targetMetaData, int ammount);
+        public void SayReportContact(TargetMetaData targetMetaData, int ammount, float bearing, float range);
     }
 }

@@ -72,6 +72,20 @@
         Clock11,
         Clock12,
 
+        // Range
+        RangeClose,
+        Range100,
+        Range200,
+        Range300,
+        Range400,
+        Range500,
+        Range750,
+        Range1000,
+        Range2000,
+        Range3000,
+        Range5000,
+        RangeFar,
+
         // Targets
         Target,
         Unknown,

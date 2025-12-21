@@ -1,5 +1,8 @@
 ﻿using CheeseMods.AIHelicopterGunner.Spotting;
 using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace CheeseMods.AIHelicopterGunner.AIHelpers
 {
@@ -23,6 +26,73 @@ namespace CheeseMods.AIHelicopterGunner.AIHelpers
                     return LineType.Count5;
             }
             return LineType.CountMany;
+        }
+
+        public static List<Tuple<float, LineType>> bearings = new List<Tuple<float, LineType>>
+        {
+            new Tuple<float, LineType>((0 / 12f) * 360f, LineType.Clock12),
+            new Tuple<float, LineType>((1 / 12f) * 360f, LineType.Clock1),
+            new Tuple<float, LineType>((2 / 12f) * 360f, LineType.Clock2),
+            new Tuple<float, LineType>((3 / 12f) * 360f, LineType.Clock3),
+            new Tuple<float, LineType>((4 / 12f) * 360f, LineType.Clock5),
+            new Tuple<float, LineType>((5 / 12f) * 360f, LineType.Clock5),
+            new Tuple<float, LineType>((6 / 12f) * 360f, LineType.Clock6),
+            new Tuple<float, LineType>((7 / 12f) * 360f, LineType.Clock7),
+            new Tuple<float, LineType>((8 / 12f) * 360f, LineType.Clock8),
+            new Tuple<float, LineType>((9 / 12f) * 360f, LineType.Clock9),
+            new Tuple<float, LineType>((10 / 12f) * 360f, LineType.Clock10),
+            new Tuple<float, LineType>((11 / 12f) * 360f, LineType.Clock11),
+        };
+        public static LineType BearingToLineType(float bearing)
+        {
+            if (bearing < 0)
+                bearing += 360f;
+
+            LineType closesLineType = LineType.Unknown;
+            float closestDistance = float.MaxValue;
+            foreach (Tuple<float, LineType> bearingLine in bearings)
+            {
+                float currentDistance = Mathf.Abs(bearingLine.Item1 - bearing);
+                if (currentDistance < closestDistance)
+                {
+                    closestDistance = currentDistance;
+                    closesLineType = bearingLine.Item2;
+                }
+            }
+
+            return closesLineType;
+        }
+
+        public static List<Tuple<float, LineType>> ranges = new List<Tuple<float, LineType>>
+        {
+            new Tuple<float, LineType>(0, LineType.RangeClose),
+            new Tuple<float, LineType>(100, LineType.Range100),
+            new Tuple<float, LineType>(200, LineType.Range200),
+            new Tuple<float, LineType>(300, LineType.Range300),
+            new Tuple<float, LineType>(400, LineType.Range400),
+            new Tuple<float, LineType>(500, LineType.Range500),
+            new Tuple<float, LineType>(750, LineType.Range750),
+            new Tuple<float, LineType>(1000, LineType.Range1000),
+            new Tuple<float, LineType>(2000, LineType.Range2000),
+            new Tuple<float, LineType>(3000, LineType.Range3000),
+            new Tuple<float, LineType>(5000, LineType.Range5000),
+            new Tuple<float, LineType>(7000, LineType.RangeFar),
+        };
+        public static LineType RangeToLineType(float range)
+        {
+            LineType closesLineType = LineType.Unknown;
+            float closestDistance = float.MaxValue;
+            foreach (Tuple<float, LineType> rangeLine in ranges)
+            {
+                float currentDistance = Mathf.Abs(rangeLine.Item1 - range);
+                if (currentDistance < closestDistance)
+                {
+                    closestDistance = currentDistance;
+                    closesLineType = rangeLine.Item2;
+                }
+            }
+
+            return closesLineType;
         }
 
         public static LineType TargetTypeToLineType(TargetTypes type)

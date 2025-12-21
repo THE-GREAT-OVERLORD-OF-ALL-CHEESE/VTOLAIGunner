@@ -35,9 +35,9 @@ namespace CheeseMods.AIHelicopterGunner.Character
         {
         }
 
-        public void SayReportContact(TargetMetaData targetMetaData, int ammount)
+        public void SayReportContact(TargetMetaData targetMetaData, int ammount, float bearing, float range)
         {
-            SayText($"Contact {targetMetaData.TargetType} x{ammount}");
+            SayText($"Contact {targetMetaData.TargetType} x{ammount}, {bearing}, {range}m");
         }
     }
 }

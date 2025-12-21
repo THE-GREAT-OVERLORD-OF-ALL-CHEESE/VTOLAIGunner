@@ -10,6 +10,7 @@ namespace AIHelicopterGunner.Character
     {
         public GunnerTargetSpotter spotter;
         public IVoice voice;
+        public Transform refTf;
 
         public List<TargetMetaData> unreportedContacts = new List<TargetMetaData>();
         public List<TargetMetaData> reportedContacts = new List<TargetMetaData>();
@@ -17,10 +18,14 @@ namespace AIHelicopterGunner.Character
         private float waitForMoreContactsTimer;
         private float contactReportDelay = 0.5f;
 
-        public ContactReporter(GunnerTargetSpotter spotter, IVoice voice)
+        private float lastReportedTime;
+        private float reportCooldown = 3f;
+
+        public ContactReporter(GunnerTargetSpotter spotter, IVoice voice, Transform refTf)
         {
             this.spotter = spotter;
             this.voice = voice;
+            this.refTf = refTf;
         }
 
         public void UpdateContactReporting()
@@ -42,15 +47,29 @@ namespace AIHelicopterGunner.Character
             if (unreportedContacts.Count > 0)
             {
                 waitForMoreContactsTimer += Time.deltaTime;
-                if (waitForMoreContactsTimer > contactReportDelay)
+                if (waitForMoreContactsTimer > contactReportDelay && Time.time + reportCooldown > lastReportedTime)
                 {
                     waitForMoreContactsTimer = 0;
+                    lastReportedTime = Time.time;
 
                     TargetMetaData currentContact = unreportedContacts.First();
 
                     List<TargetMetaData> groupToReport = new List<TargetMetaData>();
                     groupToReport = unreportedContacts.Where(c => c.TargetType == currentContact.TargetType).ToList();
-                    voice.SayReportContact(currentContact, groupToReport.Count());
+
+                    Vector3 averagePos = Vector3.zero;
+                    foreach (TargetMetaData target in groupToReport)
+                    {
+                        averagePos += target.Actor.position;
+                    }
+                    averagePos /= (float)groupToReport.Count;
+
+                    Vector3 offset = averagePos - refTf.position;
+                    float bearing = Vector3.SignedAngle(Vector3.ProjectOnPlane(refTf.forward, Vector3.up),
+                        Vector3.ProjectOnPlane(offset, Vector3.up),
+                        Vector3.up);
+
+                    voice.SayReportContact(currentContact, groupToReport.Count(), bearing, offset.magnitude);
 
                     foreach (TargetMetaData reported in groupToReport)
                     {

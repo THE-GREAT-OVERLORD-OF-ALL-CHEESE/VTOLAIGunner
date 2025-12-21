@@ -144,6 +144,10 @@ namespace CheeseMods.AIHelicopterGunner.Spotting
             ("a10", TargetTypes.Attack),
             ("f16", TargetTypes.Fighter),
             ("f22", TargetTypes.Fighter),
+
+            //assumptions based on name
+            ("mbt", TargetTypes.Tank),
+            ("tank", TargetTypes.Tank),
         };
     }
 }
