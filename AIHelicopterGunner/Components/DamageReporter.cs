@@ -1,4 +1,5 @@
 using CheeseMods.AIHelicopterGunner.Character;
+using CheeseMods.AIHelicopterGunnerAssets.ScriptableObjects;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -29,6 +30,7 @@ namespace CheeseMods.AIHelicopterGunner.Components
     {
         public Health health;
         public IVoice voice;
+        public LineType lineType;
         public bool reportedDamage;
 
         private static readonly Dictionary<string, string> friendlyNames = new()
@@ -47,6 +49,45 @@ namespace CheeseMods.AIHelicopterGunner.Components
         {
             this.health = health;
             this.voice = voice;
+
+            string name = health.gameObject.name;
+
+            // Use friendly name if available
+            if (friendlyNames.TryGetValue(name, out string friendlyName))
+            {
+                name = friendlyName;
+            }
+
+            switch (health.gameObject.name)
+            {
+                case "Engine 1":
+                    lineType = LineType.Engine1;
+                    break;
+                case "Engine 2":
+                    lineType = LineType.Engine2;
+                    break;
+                case "APU":
+                    lineType = LineType.APU;
+                    break;
+                case "Main Rotor":
+                    lineType = LineType.Rotor;
+                    break;
+                case "Tail Rotor":
+                    lineType = LineType.TailRotor;
+                    break;
+                case "Left Wing":
+                    lineType = LineType.LeftWing;
+                    break;
+                case "Right Wing":
+                    lineType = LineType.RightWing;
+                    break;
+                case "Tail":
+                    lineType = LineType.Tail;
+                    break;
+                default:
+                    lineType = LineType.Unknown;
+                    break;
+            }
         }
 
         public void CheckDamage()
@@ -57,29 +98,7 @@ namespace CheeseMods.AIHelicopterGunner.Components
 
                 if (health.isDead)
                 {
-                    string name = health.gameObject.name;
-
-                    // Use friendly name if available
-                    if (friendlyNames.TryGetValue(name, out string friendlyName))
-                    {
-                        name = friendlyName;
-                    }
-
-                    switch (name)
-                    {
-                        case "Engine 1":
-                            voice.SaySystemDestroyed(AIHelicopterGunnerAssets.ScriptableObjects.LineType.Engine1);
-                            break;
-                        case "Engine 2":
-                            voice.SaySystemDestroyed(AIHelicopterGunnerAssets.ScriptableObjects.LineType.Engine2);
-                            break;
-                        case "APU":
-                            voice.SaySystemDestroyed(AIHelicopterGunnerAssets.ScriptableObjects.LineType.APU);
-                            break;
-                        default:
-                            voice.Say($"{name} is destroyed");
-                            break;
-                    }
+                    voice.SaySystemDestroyed(lineType);
                 }
             }
         }

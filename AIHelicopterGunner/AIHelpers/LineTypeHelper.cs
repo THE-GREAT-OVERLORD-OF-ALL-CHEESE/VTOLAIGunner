@@ -153,12 +153,48 @@ namespace CheeseMods.AIHelicopterGunner.AIHelpers
                     return LineType.LHA;
                 case TargetTypes.Aircraft:
                     return LineType.Aircraft;
+                case TargetTypes.Plane:
+                    return LineType.Aircraft; // TODO
                 case TargetTypes.Helicopter:
                     return LineType.Helicopter;
+                case TargetTypes.AH94:
+                    return LineType.AH94;
+                case TargetTypes.AH6:
+                    return LineType.AH6;
+                case TargetTypes.AH64:
+                    return LineType.AH64;
                 case TargetTypes.Attack:
                     return LineType.Attack;
+                case TargetTypes.AV42:
+                    return LineType.AV42;
+                case TargetTypes.GAV25:
+                    return LineType.GAV25;
+                case TargetTypes.AV44:
+                    return LineType.AV44;
+                case TargetTypes.A10:
+                    return LineType.A10;
                 case TargetTypes.Fighter:
                     return LineType.Fighter;
+                case TargetTypes.FA26B:
+                    return LineType.FA26B;
+                case TargetTypes.F45:
+                    return LineType.F45;
+                case TargetTypes.EF24G:
+                    return LineType.EF24G;
+                case TargetTypes.T55:
+                    return LineType.T55;
+                case TargetTypes.ASF30:
+                    return LineType.ASF30;
+                case TargetTypes.ASF33:
+                    return LineType.ASF33;
+                case TargetTypes.ASF58:
+                    return LineType.ASF58;
+                case TargetTypes.F16:
+                    return LineType.F16;
+                case TargetTypes.F18:
+                    return LineType.F18;
+                case TargetTypes.F22:
+                    return LineType.F22;
                 case TargetTypes.Bomber:
                     return LineType.Bomber;
                 case TargetTypes.AWACS:

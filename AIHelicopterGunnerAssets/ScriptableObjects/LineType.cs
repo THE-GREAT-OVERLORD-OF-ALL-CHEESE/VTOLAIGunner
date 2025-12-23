@@ -13,12 +13,19 @@
         Destroyed,
         //On,
         //Off,
-        APU,
-        Engine1,
-        Engine2,
         ThrottleOff,
         ThrottleToIdle,
         ThrottleToFull,
+
+        // Parts
+        APU,
+        Engine1,
+        Engine2,
+        Rotor,
+        TailRotor,
+        LeftWing,
+        RightWing,
+        Tail,
 
         // Combat
         Rifle,
@@ -118,17 +125,45 @@
         Carrier,
         LHA,
 
+
         Aircraft,
         Helicopter,
+            AH94,
+            AH6,
+            AH64,
+        Plane,
         Attack,
+            AV42,
+            GAV25,
+            AV44,
+            A10,
         Fighter,
+            FA26B,
+            F45,
+            T55,
+            EF24G,
+            ASF30,
+            ASF33,
+            ASF58,
+            F16,
+            F18,
+            F22,
         Bomber,
         AWACS,
         RefuelPlane,
 
         Structure,
         Tent,
-        Bunker
+        Bunker,
+
+        // Missile Warning
+        IRLaunch,
+        RADARLaunch,
+        TowLaunch,
+        IRMissle,
+        RadarMissile,
+        TowMissile,
+        Missile,
     }
 
     public enum LineModifier

@@ -282,25 +282,28 @@ namespace CheeseMods.AIHelicopterGunner.Spotting
             ("ah94", TargetTypes.Helicopter, TargetTypeSpecial.None),
 
             // fixedwing
-            ("av42", TargetTypes.Attack, TargetTypeSpecial.None),
-            ("fa26", TargetTypes.Fighter, TargetTypeSpecial.None),
-            ("f45", TargetTypes.Fighter, TargetTypeSpecial.None),
-            ("t55", TargetTypes.Fighter, TargetTypeSpecial.None),
-            ("ef24", TargetTypes.Fighter, TargetTypeSpecial.EWAR),
+            ("av42", TargetTypes.AV42, TargetTypeSpecial.None),
+            ("fa26", TargetTypes.FA26B, TargetTypeSpecial.None),
+            ("f45", TargetTypes.F45, TargetTypeSpecial.None),
+            ("t55", TargetTypes.T55, TargetTypeSpecial.None),
+            ("ef24", TargetTypes.EF24G, TargetTypeSpecial.EWAR),
             // player altnames
-            ("vtol4", TargetTypes.Fighter, TargetTypeSpecial.None),
-            ("sevtf", TargetTypes.Fighter, TargetTypeSpecial.None),
+            ("vtol4", TargetTypes.AV42, TargetTypeSpecial.None),
+            ("sevtf", TargetTypes.F45, TargetTypeSpecial.None),
 
-            ("asf30", TargetTypes.Fighter, TargetTypeSpecial.None),
-            ("asf33", TargetTypes.Fighter, TargetTypeSpecial.None),
-            ("asf58", TargetTypes.Fighter, TargetTypeSpecial.None),
-            ("gav25", TargetTypes.Attack, TargetTypeSpecial.None),
+            ("asf30", TargetTypes.ASF30, TargetTypeSpecial.None),
+            ("asf33", TargetTypes.ASF33, TargetTypeSpecial.None),
+            ("asf58", TargetTypes.ASF58, TargetTypeSpecial.None),
+            ("gav25", TargetTypes.GAV25, TargetTypeSpecial.None),
 
             //popular mods
-            ("ah6", TargetTypes.Helicopter, TargetTypeSpecial.None),
-            ("a10", TargetTypes.Attack, TargetTypeSpecial.None),
-            ("f16", TargetTypes.Fighter, TargetTypeSpecial.None),
-            ("f22", TargetTypes.Fighter, TargetTypeSpecial.None)
+            ("ah6", TargetTypes.AH6, TargetTypeSpecial.None),
+            ("ah64", TargetTypes.AH64, TargetTypeSpecial.None),
+            ("a10", TargetTypes.A10, TargetTypeSpecial.None),
+            ("av44", TargetTypes.AV44, TargetTypeSpecial.None),
+            ("f16", TargetTypes.F16, TargetTypeSpecial.None),
+            ("f18", TargetTypes.F18, TargetTypeSpecial.None),
+            ("f22", TargetTypes.F22, TargetTypeSpecial.None)
         };
 
         public static List<(string name, TargetTypes type, TargetTypeSpecial special)> lastResortGroundNames
